@@ -1,0 +1,1478 @@
+<template>
+  <div>
+    <Row style="margin-top: 15px" type="flex" >
+      <Col span="4" style="margin-left: 5px">
+        <span ><Button type="primary" @click="addModal" icon="search">增加</Button></span>
+        <span ><Button  type="error"  @click="this.delete" icon="trash-a">批量删除</Button></span>
+      </Col>
+      <!-- <Col span="3">
+          <Select @on-change="searchComplaint" v-model="params.teamId" placeholder="选择团队" style="width: 200px" clearable>
+            <Option v-for="teamNameId in teamNameIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id" >
+              {{teamNameId.teamname}}
+            </Option>
+          </Select>
+      </col> -->
+      <Col span="4">
+          <Select @on-change="searchComplaint" v-model="params.TScustomer" placeholder="选择店长" style="width: 200px" clearable filterable>
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+              {{teamNameId.username}}
+            </Option>
+          </Select>
+      </col>
+      <!-- <Col span="3">
+          <Select @on-change="searchComplaint" v-model="params.technologyRecruitmentid" placeholder="选择车手" style="width: 200px">
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+              {{teamNameId.username}}
+            </Option>
+          </Select>
+      </col> -->
+      <Col span="4">
+          <Select @on-change="searchComplaint" v-model="params.PersonnelID" placeholder="选择招商顾问" style="width: 200px" clearable filterable>
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+              {{teamNameId.username}}
+            </Option>
+          </Select>
+      </col>
+      <Col span="4">
+          <Select @on-change="searchComplaint" v-model="params.TechnologyRecruitmentID" placeholder="选择车手" style="width: 200px" clearable filterable>
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+              {{teamNameId.username}}
+            </Option>
+          </Select>
+      </col>
+      <Col span="4" style="margin-left: 0px">
+        <i-select @on-change="searchComplaint" v-model="params.status" placeholder="选择状态" filterable style="width:200px" clearable>
+        <Option value="0">待审核</Option>
+        <Option value="1">已审核</Option>
+        <Option value="2">待审定</Option>
+        <Option value="-1">全部</Option>
+      </i-select>
+      </Col>
+        <Col span="4">
+            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" placeholder="开始时间" style="width: 200px"></DatePicker>
+            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" placeholder="结束时间" style="width: 200px"></DatePicker>
+        </Col>
+      <Col span="4">
+        <Input v-model="params.frequency" placeholder="搜索投诉数量" :clearable="isClearAble"  @click="searchComplaint"/>
+      </Col>
+      <Col span="4">
+        <Input v-model="params.TeamName" placeholder="搜索团队名" :clearable="isClearAble"  @click="searchComplaint"/>
+      </Col>
+      <Col span="4">
+        <i-select v-model="params.channel" style="width: 300px"  placeholder="请选择投诉渠道"  :clearable="isClearAble"  @click="searchComplaint">
+                <Option value="1">招商京东</Option>
+                <Option value="2">招商淘宝</Option>
+                <Option value="3">综管部</Option>
+                <Option value="4">企划部</Option>
+                <Option value="5">京东官方投诉</Option>
+                <Option value="6">京东差评投诉</Option>
+                <Option value="7">淘宝官方投诉</Option>
+                <Option value="8">其他</Option>
+            </i-select>
+      </Col>
+      <Col span="4">
+        <Input v-model="params.keyword" placeholder="搜索客户名，投诉时间"  :clearable="isClearAble"/>
+      </Col>
+      <Col span="1" style="margin-left: 5px">
+        <span ><Button type="primary" @click="searchComplaint" icon="search">搜索</Button></span>
+      </Col>
+    </Row>
+    <Row style="margin-top: 25px">
+      <Table border ref="selection"
+             :columns="columns1"
+             :current="params.pageNum"
+             @on-selection-change="selectionChange"
+             :data="data1" width=100%>
+      </Table>
+    </Row>
+    <Row>
+      <Col/>
+        <Button @click="handleSelectAll(true)">全选</Button>
+        <Button @click="handleSelectAll(false)">取消全选</Button>
+    </Row>
+
+    <Row>
+      <div style="float:right">
+        <Page :total="totalCount" :page-size="params.pagesize"
+              loading show-sizer @on-change="pageChange"
+              @on-page-size-change="sizeChange"
+        />
+      </div>
+    </Row>
+    <!-- 添加 -->
+    <Modal v-model="showAddModal"
+           @on-ok="save"
+           @on-cancel="cancel"
+           @on-visible-change="resetData">
+      <h3 slot="header" style="color:#2D8CF0">增加信息</h3>
+      <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" :rules="addForm">
+        <!-- <FormItem  label="ID" prop="pkId" >
+           <Input v-model="showAddForm.pkId" :disabled="isDisabled"></Input>
+         </FormItem>-->
+
+        <FormItem  label="投诉客户" prop="wangwangnum" >
+          <Input @on-blur="yanzheng" v-model="showEditForm.wangwangnum"
+                 placeholder="请输入投诉客户" style="width: 300px" :clearable="isClearAble"/>
+        </FormItem>
+        <FormItem  label="投诉渠道" prop="channel">
+          <Select v-model="showEditForm.channel" style="width: 300px"  placeholder="请选择投诉渠道">
+                <Option value="1">招商京东</Option>
+                <Option value="2">招商淘宝</Option>
+                <Option value="3">综管部</Option>
+                <Option value="4">企划部</Option>
+                <Option value="5">京东官方投诉</Option>
+                <Option value="6">京东差评投诉</Option>
+                <Option value="7">淘宝官方投诉</Option>
+                <Option value="8">其他</Option>
+            </Select>
+        </FormItem>
+        <FormItem  label="投诉内容" prop="content" >
+          <Input v-model="showEditForm.content"
+                 placeholder="请输入投诉内容" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
+        </FormItem>
+        <FormItem label="投诉日期" prop="complaintdate">
+          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.complaintdate" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
+        </FormItem>
+        <!-- <FormItem label="场景还原" prop="scenerestoration"> -->
+        <!-- 远程上传 -->
+          <!-- <Upload
+                ref="upload" name="file"
+                action="http://192.168.1.251:9090/mj-admin/sys/complaint/uploads"
+                :on-success="handleSuccess"
+                :on-format-error="handleFormatError">
+              <i-button type="primary" icon="ios-cloud-upload-outline">上传文件</i-button>
+          </Upload> -->
+          <!-- 本地上传 -->
+          <!-- <Upload
+                multiple
+                ref="upload" name="file"
+                action="http://localhost:8090/sys/complaint/uploads"  
+                :on-success="handleSuccess"
+                :on-format-error="handleFormatError"> -->
+                <!-- :before-upload="handleUpload" -->
+              <!-- <i-button type="primary" icon="ios-cloud-upload-outline" @click="toAdd">上传文件</i-button>
+          </Upload> -->
+
+          <!-- <template>
+                <template v-if="item.status === 'finished'">
+                    <img :src="item.url">
+                    <div class="demo-upload-list-cover">
+                        <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+                    </div>
+                </template>
+              <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :on-success="handleSuccess"
+                  :on-format-error="handleFormatError"
+                  :before-upload="handleBeforeUpload"
+                  :multiple="true"
+                  action="http://localhost:8090/sys/complaint/uploads"
+                  style="display: inline-block;width:58px;">
+                  <div style="width: 58px;height:58px;line-height: 58px;">
+                      <Icon type="ios-camera" size="30"></Icon>
+                  </div>
+              </Upload>
+          </template> 
+       </FormItem> -->
+        <FormItem  label="备注" prop="remarks" >
+          <Input v-model="showEditForm.remarks"
+                 placeholder="备注" style="width: 300px"  type="textarea" :autosize="{minRows: 5,maxRows: 5}" :clearable="isClearAble"/>
+        </FormItem>
+      </Form>
+    </Modal>
+    <!--上传文件-->
+    <Modal v-model="ts"
+           @on-ok="uploadFileEdit"
+           @on-cancel="cancelFileEdit">
+      <h3 slot="header" style="color:#2D8CF0">上传文件</h3>
+       <!-- <Table border ref="selection"
+             :columns="columns3"
+             :current="params.pageNum"
+             @on-selection-change="selectionChange"
+             :data="data3" width=100%>
+      </Table> -->
+          <template>
+                <template v-if="item.status === 'finished'">
+                    <img :src="item.url">
+                    <div class="demo-upload-list-cover">
+                        <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
+                    </div>
+                </template>
+              <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :on-success="handleSuccess"
+                  :on-format-error="handleFormatError"
+                  :before-upload="handleBeforeUpload"
+                  :multiple="true"
+                  action="http://192.168.1.112:9090/mj-admin/sys/complaint/uploads"
+                  style="display: inline-block;width:58px;">
+                  <div style="width: 58px;height:58px;line-height: 58px;">
+                      <Icon type="ios-camera" size="30"></Icon>
+                  </div>
+              </Upload>
+          </template> 
+     </Modal>
+    <Modal v-model="showModal"
+           @on-ok="saveFileTable"
+           @on-visible-change="resetData"
+           @on-cancel="cancelFileTable"
+           width="800">
+      <h3 slot="header" style="color:#2D8CF0">历史记录</h3>
+      <Table border ref="selection"
+             :columns="columns2"
+             :current="params.pageNum"
+             @on-selection-change="selectionChange"
+             :data="data2"
+             >
+      </Table>
+    </Modal>
+    <!--根据判责id查看文件-->
+    <Modal v-model="showFileModal"
+              @on-ok="saveTable"
+              @on-visible-change="resetData"
+              @on-cancel="cancelTable"
+              width="800">
+          <h3 slot="header" style="color:#2D8CF0">历史记录</h3>
+          <Table border ref="selection"
+                :columns="columns3"
+                :current="params.pageNum"
+                @on-selection-change="selectionChange"
+                :data="data3"
+                >
+          </Table>
+    </Modal>
+
+     <Modal v-model="reViewModal"
+           @on-ok="saveEdit"
+           @on-cancel="cancelEdit">
+      <h3 slot="header" style="color:#2D8CF0">审核</h3>
+      <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
+            <FormItem label="状态" prop="status">
+              <RadioGroup v-model="showEditForm.status">
+                <Radio :label="0" >待审核</Radio>
+                <Radio :label="1" >已审核</Radio>
+                <Radio :label="2" >待审定</Radio>
+              </RadioGroup>
+        </FormItem>
+      </Form>
+     </Modal>
+
+    <Modal v-model="showEditModal"
+           @on-ok="saveEdit"
+           @on-cancel="cancelEdit"
+           width="800">
+      <h3 slot="header" style="color:#2D8CF0">修改信息</h3>
+      <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
+        <Col span="12">
+        <FormItem  label="投诉客户" prop="wangwangnum" >
+          <Input v-model="showEditForm.wangwangnum"/>
+        </FormItem>
+        </Col>
+        <Col span="12">
+        <FormItem  label="投诉次数(第几次)" prop="frequency">
+          <Input v-model="showEditForm.frequency" disabled/>
+        </FormItem>
+        </Col>
+         <Col span="12">
+          <FormItem label="投诉日期" prop="complaintdate">
+          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.complaintdate" placeholder="Select date and time(Excluding seconds)" style="width: 280px"></DatePicker>
+        </FormItem>
+         </Col>
+         <Col span="12">
+         <FormItem label="店长" prop="username">
+          <Input v-model="showEditForm.username" disabled/>
+          <!-- <Select v-model="showEditForm.tscustomer" placeholder="无店长">
+            <Option v-for="tscustomerId in personnelIds" :label="tscustomerId.username" :value="tscustomerId.id" :key="tscustomerId.id">
+              {{tscustomerId.username}}
+            </Option>
+          </Select> -->
+        </FormItem>
+         </Col>
+         <Col span="12">
+         <FormItem label="投诉渠道" prop="channel">
+          <select v-model="showEditForm.channel" style="width: 280px;height:35px" disabled>
+                <option value="1">招商京东</option>
+                <option value="2">招商淘宝</option>
+                <option value="3">综管部</option>
+                <option value="4">企划部</option>
+                <option value="5">京东官方投诉</option>
+                <option value="6">京东差评投诉</option>
+                <option value="7">淘宝官方投诉</option>
+                <option value="8">其他</Option>
+            </select>
+        </FormItem>
+         </Col>
+         <Col span="12">
+         <FormItem label="所属团队" prop="teamname">
+          <Input v-model="showEditForm.teamname" disabled/>
+
+          <!-- <Select v-model="showEditForm.tscustomer" placeholder="无团队">
+            <Option v-for="teamNameId in teamNameIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+              {{teamNameId.teamname}}
+            </Option>
+          </Select> -->
+        </FormItem>
+         </Col>
+         <Col span="12">
+          <FormItem  label="客户类型" prop="shopptype" >
+          <Input v-model="showEditForm.shopptype" disabled/>
+        </FormItem>
+         </Col>
+         <Col span="12">
+          <FormItem  label="车手:" prop="tename">
+          <Input v-model="showEditForm.tename" disabled placeholder="暂无对应车手"/>
+        </FormItem>
+         </Col>
+         <!-- <Col span="12">
+         <FormItem label="车手" prop="username">
+          <Select v-model="showEditForm.technologyRecruitmentid" placeholder="无车手">
+            <Option v-for="technologyRecruitmentId in personnelIds" :label="technologyRecruitmentId.username" :value="technologyRecruitmentId.id" :key="technologyRecruitmentId.id">
+              {{technologyRecruitmentId.username}}
+            </Option>
+          </Select>
+        </FormItem>
+         </Col> -->
+         <Col span="12">
+         <FormItem label="判责结果" prop="status" >
+          <select v-model="showEditForm.status" placeholder="选择状态" filterable  style="width: 280px;height:35px" disabled>
+            <option value="0">待审核</option>
+            <option value="1">已审核</option>
+            <option value="2">待审定</option>
+          </select>
+        </FormItem>
+         </Col>
+         <Col span="12">
+          <FormItem label="招商顾问" prop="username">
+          <Select v-model="showEditForm.personnelid" placeholder="无招商顾问">
+            <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
+              {{personnelId.username}}
+            </Option>
+          </Select>
+        </FormItem>
+         </Col>
+         <Col span="12">
+         </Col>
+        <FormItem label="投诉原因" prop="content">
+           <Input v-model="showEditForm.content"
+                 placeholder="请输入投诉内容" type="textarea" :autosize="{minRows: 5,maxRows: 5}" :clearable="isClearAble"/>
+        </FormItem>
+        <FormItem  label="备注" prop="remarks" >
+          <Input v-model="showEditForm.remarks"   placeholder="请输入投诉备注" type="textarea" :autosize="{minRows: 5,maxRows: 5}" :clearable="isClearAble"/>
+        </FormItem>
+        <!-- <FormItem label="场景还原地址" prop="scenerestoration">
+          <ul style="list-style:none">
+            <li v-for="(item,index) in url" class="forteItem" :key="index"> -->
+                <!-- <a :href="showEditForm.scenerestoration" target="_Blank">{{showEditForm.scenerestoration}}</a> -->
+                <!-- <a :href="item" target="_Blank">{{item}}</a>
+                <i-button type="primary" @click="deleteFile(item)">删除</i-button>
+            </li>
+          </ul> -->
+          <!-- <Input v-model="showEditForm.scenerestoration"  :clearable="isClearAble" :autofocus="true"/> -->
+        <!-- </FormItem> -->
+         <!-- <Col span="12">
+        <FormItem label="场景还原文件名" prop="sceneRestorationName">
+        <Input v-model="showEditForm.sceneRestorationName" disabled/>
+        </FormItem>
+        </Col> -->
+        <!-- <FormItem label="场景还原文件" prop="scenerestoration"> -->
+          <!-- 远程上传 -->
+          <!-- <Upload
+                ref="upload" name="file"
+                action="http://192.168.1.251:9090/mj-admin/sys/complaint/uploads"
+                :on-success="handleSuccess"
+                :on-format-error="handleFormatError">
+              <i-button type="primary" icon="ios-cloud-upload-outline">上传文件</i-button>
+          </Upload> -->
+           <!-- 本地上传 -->
+          <!-- <Upload
+                multiple
+                ref="upload" name="file"
+                action="http://localhost:8090/sys/complaint/uploads"
+                :on-success="handleSuccess"
+                :on-format-error="handleFormatError">
+              <i-button type="primary" icon="ios-cloud-upload-outline">上传文件</i-button>
+          </Upload>
+       </FormItem> -->
+        <!-- <FormItem label="客诉大类别" prop="levelName">
+          <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level">
+            <Option v-for="levelId in levels" :label="levelId.levelName" :value="levelId.level" :key="levelId.level">
+              {{levelId.levelName}}
+            </Option>
+          </Select>
+        </FormItem> -->
+
+        <!-- <FormItem label="客诉小类别" prop="complaintName">
+          <Select v-model="showEditForm.complaintIds" placeholder="Select your pkId">
+            <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName"
+                    :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+              {{complaintNameId.complaintName}}
+            </Option>
+          </Select>
+        </FormItem>
+
+        <FormItem label="判责结果" prop="result">
+          <RadioGroup v-model="showEditForm.result">
+            <Radio :label="0" >无责</Radio>
+            <Radio :label="1" >有责</Radio>
+            <Radio :label="2" >待定</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="判责结果" prop="status">
+          <RadioGroup v-model="showEditForm.status">
+            <Radio :label="0" >待审核</Radio>
+            <Radio :label="1" >已审核</Radio>
+            <Radio :label="2" >待审定</Radio>
+          </RadioGroup>
+        </FormItem>
+        <FormItem label="责任轻重" prop="responsibility">
+          <RadioGroup v-model="showEditForm.responsibility">
+            <Radio :label="0" >微责</Radio>
+            <Radio :label="1" >轻责</Radio>
+            <Radio :label="2" >中责</Radio>
+            <Radio :label="3" >重责</Radio>
+          </RadioGroup>
+        </FormItem> -->
+        
+        <!-- <FormItem label="责任人id" prop="complaintId">
+          <Select v-model="showEditForm.complaintid" placeholder="Select your level">
+            <Option v-for="complaintId in complaintids" :label="complaintId.username" :value="complaintId.id" :key="complaintId.id">
+              {{complaintId.username}}
+            </Option>
+          </Select>
+        </FormItem> -->
+      </Form>      
+    </Modal>
+
+    <Modal v-model="showDeleteModal"
+           width=15
+           @on-ok="saveDelete"
+           @on-cancel="cancelDelete">
+      <!--<h3 slot="header" style="color:red">确定删除吗</h3>-->
+      <h2 style="color:red;text-align: center;font-size: 20px" >确定删除吗</h2>
+    </Modal>
+    <!-- 删除文件 -->
+    <Modal v-model="deleteModal"
+           width=15
+           @on-ok="deletefiles"
+           @on-cancel="cancelDeleteFile">
+      <!--<h3 slot="header" style="color:red">确定删除吗</h3>-->
+      <h2 style="color:red;text-align: center;font-size: 20px" >确定删除改文件么</h2>
+    </Modal>
+  </div>
+</template> 
+
+<script>
+  import API from "../../api";
+import Vue from 'vue';
+    export default {
+        name: "Complaint",
+      data(){
+        return{
+          params: {
+            pageNum: 1,
+            pagesize: 10,
+            keyword: '',
+            status:-1,
+            startTime:'',
+            endTime:'',
+            TScustomer:null,
+            TechnologyRecruitmentID:-1,
+            PersonnelID:-1,
+            channel: -1,
+            frequency: '',
+            TeamID:-1,
+            TeamName:null
+          },
+          params1:{
+            level:0,
+          },
+          showEditModal: false,
+          reViewModal:false,
+          showAddModal: false,
+          totalCount: 0,
+          tscustomer:[],
+          complaintids:[],
+          teamNameIds:[],
+          tscustomerIds:[],
+          personnelIds:[],
+          url:null,
+          name:null,
+          complaintId:0,
+          item:[1],
+          uploadData:null,
+          technologyRecruitmentIds:[],
+          pageNumber:[],//表格页数
+          length:[], //表格每页长度
+          size:[],//批量删除时候选中的个数
+          showModal:false,
+          showFileModal:false,
+          ts:false,
+          showAddForm:{
+            wangwangnum: '',
+            complaintdate: '',
+            channel: '',
+            content:'',
+            scenerestoration:'',
+            remarks:'',
+          },
+          showEditForm:{
+            pkId: '',
+            wangwangnum: '',
+            complaintdate: '',
+            channel: '',
+            scenerestoration: '',
+            remarks: '',
+            frequency: '',
+            // level: '',
+            // result: '',
+            // personnelid: '',
+            // responsibility: '',
+            content: '',
+            shopptype: '',
+            department: '',
+            isStop: '',
+            custtype: '',
+            worktype: '',
+            status: '',
+            tscustomer: '',
+            parentId: '',
+            teamname:'',
+            tename:'',
+            // complaintName: '',
+            // sonId: '',
+            isDelete: '',
+            createTime: '',
+            complaintid: '',
+            personnelid: '',
+            technologyRecruitmentid: '',
+            // levelName:'',
+            complaintIds: '',
+            username:'',
+            sceneRestorationName:'',
+            url:'',
+            name:'',
+            complaintId:'',
+         },
+          //表单验证(如果为空就会提示)
+      addForm:{
+        wangwangnum: [
+            {required: true, message: '请输入投诉客户', trigger: 'blur'}
+          ],
+        channel: [
+            {required: true, message: '请选择投诉渠道', trigger: 'blur'}
+          ],
+        content: [
+            {required: true, message: '请输入投诉内容', trigger: 'blur'}
+          ]
+      },
+          loading:false,
+          showDeleteModal:false,
+          deleteModal:false,
+          columns1:[
+            {
+              type: 'selection',
+              width: 60,
+              align: 'center',
+              fixed: 'left'
+            },
+            {
+              title: '客户名',
+              align: 'center',
+              key: 'wangwangnum'
+            },
+            {
+              title: '店铺类型',
+              align: 'center',
+              key: 'shopptype'
+            },
+            {
+              title: '投诉次数(第几次)',
+              align: 'center',
+              key: 'frequency'
+            },
+
+            {
+              title: '投诉渠道',
+              key: 'channel',
+              render: (h, params) => {
+                const row = params.row;
+                const color=row.channel==1 ? 'green' :(row.channel ==2 ? 'green':(row.channel ==3 ? 'green':(row.channel ==4 ? 'green':(row.channel == 5 ? 'green':(row.channel == 6 ? 'green':(row.channel == 7 ? 'green':'green'))))));
+                const text=row.channel==1 ? '招商京东' :(row.channel ==2 ? '招商淘宝':(row.channel ==3 ? '综管部 ':(row.channel ==4 ? '企划部':(row.channel == 5 ? '京东官方投诉':(row.channel == 6 ? '京东差评投诉 ':(row.channel == 7 ? '淘宝官方投诉':'其他'))))));
+
+                return h('Tag', {
+                  props: {
+                    color: color
+                  }
+                }, text);
+              },
+              align: 'center'
+            },
+
+            {
+              title: '店长',
+              align: 'center',
+              key: 'username'
+              // key:'tscustomer'
+            },
+             {
+              title: '客诉内容',
+              align: 'center',
+              key: 'content',
+              render: (h, params) => {
+                                      return h('div', [
+                                          h('span', {
+                                              style: {
+                                                  display: 'inline-block',
+                                                  width: '100%',
+                                                  overflow: 'hidden',
+                                                  textOverflow: 'ellipsis',
+                                                  whiteSpace: 'nowrap'
+                                              },
+                                              domProps: {
+                                                  title: params.row.content
+                                              }
+                                          }, params.row.content)
+                                      ])
+                                  }
+
+            },
+            {
+              title: '状态',
+              key: 'status',
+              render: (h, params) => {
+                const row = params.row;
+                const color=row.status==0 ? 'green' :(row.status ==1 ? 'red':'blue');
+                const text=row.status==0 ? '待审核' :(row.status ==1 ? "已审核":"待审定");
+
+                return h('Tag', {
+                  props: {
+                    color: color
+                  }
+                }, text);
+              },
+              align: 'center'
+            },
+             {
+              title: '投诉日期',
+              align: 'center',
+              key: 'complaintdate'
+            },
+            {
+              title: '操作',
+              key: 'action',
+              align: 'center',
+              render: (h, params) => {
+                let editBtn = h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: () => {
+                      this.showEditModalData(params);
+                    }
+                  }
+                }, '修改');
+                let reViewBtn = h('Button', {
+                  props: {
+                    type: 'warning',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: ()=>{
+                      this.reViewEditModalData(params);
+                    }
+                  }
+                }, '审核');
+                let deleteBtn = h('Button', {
+                  props: {
+                    type: 'error',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: ()=>{
+                      this.delete(params);
+                    }
+                  }
+                }, '删除');
+                let showBtn = h('Button', {
+                  props: {
+                    type: 'success',
+                    size: 'small'
+
+                  },
+                   style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: () =>{
+                      this.lookModal(params);
+                    }
+                  }
+
+                }, '历史记录');
+                let lookBtn = h(
+                  'Button', {
+                  props: {
+                    type: 'success',
+                    size: 'small'
+
+                  },
+                   style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: () =>{
+                      this.fileModal(params);
+                    }
+                  }
+
+                }, '上传文件');
+                let lookFileBtn = h(
+                  'Button', {
+                  props: {
+                    type: 'success',
+                    size: 'small'
+
+                  },
+                   style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: () =>{
+                      this.lookFileModal(params);
+                    }
+                  }
+
+                }, '查看文件')
+                return h(
+                  'div', [editBtn, deleteBtn, showBtn,lookBtn,lookFileBtn]
+                );
+              }
+            }
+          ],
+          columns2:[
+            {
+              title: '审核状态',
+              align: 'center',
+              key: 'status',
+              render: (h, params) => {
+                const row = params.row;
+                const color=row.status==0 ? 'green' :(row.status ==1 ? 'red':'blue');
+                const text=row.status==0 ? '待审核' :(row.status ==1 ? "已审核":"待审定");
+
+                return h('Tag', {
+                  props: {
+                    color: color
+                  }
+                }, text);
+              },
+            },
+             {
+              title: '投诉日期',
+              align: 'center',
+              key: 'complaintdate'
+            },
+            {
+              title: '客户',
+              align: 'center',
+              key: 'wangwangnum'
+            },
+            {
+              title: '客诉内容',
+              align: 'center',
+              key: 'content',
+              render: (h, params) => {
+                                      return h('div', [
+                                          h('span', {
+                                              style: {
+                                                  display: 'inline-block',
+                                                  width: '100%',
+                                                  overflow: 'hidden',
+                                                  textOverflow: 'ellipsis',
+                                                  whiteSpace: 'nowrap'
+                                              },
+                                              domProps: {
+                                                  title: params.row.content
+                                              }
+                                          }, params.row.content)
+                                      ])
+                                  }
+
+            },
+            {
+              title: '投诉次数(第几次)',
+              align: 'center',
+              key: 'frequency'
+            },
+             {
+              title: '操作',
+              key: 'action',
+              align: 'center',
+              render: (h, params) => {
+                let editBtn = h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: () => {
+                      this.showEditModalData(params);
+                    }
+                  }
+                }, '查看');
+                return h(
+                  'div', [editBtn]
+                );
+              }
+             }
+          ],
+          columns3:[
+              {
+              title: '文件名',
+              align: 'center',
+              key: 'name'
+            },
+            {
+              title: '文件路径',
+              align: 'center',
+              render:(h,showEditForm)=>{
+                return h('div',[
+                  h('a',{
+                    attrs:{
+                      target:"_blank",
+                      href: showEditForm.row.url,
+                    },
+                  },showEditForm.row.name)
+                ])
+              }
+            },
+            {
+              title: '操作',
+              key: 'action',
+              align: 'center',
+              render: (h, params) => {
+                let deleteFileBtn = h('Button', {
+                  props: {
+                    type: 'primary',
+                    size: 'small'
+                  },
+                  style: {
+                    marginRight: '8px'
+                  },
+                  on: {
+                    click: () => {
+                      this.deleteFileModalData(params);
+                    }
+                  }
+                }, '删除');
+                return h(
+                  'div', [deleteFileBtn]
+                );
+              }
+             }
+          ],
+          isClearAble: true,
+          isDisabled: true,
+          loadingStatus:false,
+          levels:[],
+          levelNames:[],
+          data1:[],
+          data2:[],
+          data3:[],
+          pkIds:0,
+          urlId:[],
+        }
+      },
+      //生命周期
+      mounted()
+      {
+        // 初始化
+        this.init();
+      //  this.second();
+      },
+      created:function(){
+
+      },
+      methods:{
+        handleSelectAll (status) {
+          this.$refs.selection.selectAll(status);
+        },
+        searchComplaint(){
+          // 数据初始化
+          this.loading = true;
+          this.params.pageNum=1;
+          API.complaintList.lists(this.params).then(({data}) => {
+            if (data && data.code == 0) {
+              this.data1 = data.data.list;
+              this.totalCount = data.data.total;
+              this.length=data.data.list.length
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+          this.loading = false;
+        },
+        init() {
+          // 数据初始化
+          this.loading = true;
+          API.complaintList.lists(this.params).then(({data}) => {
+            if (data && data.code == 0) {
+              this.data1 = data.data.list;
+              this.totalCount = data.data.total;
+              this.length=data.data.list.length;
+              for(var i = 0;i<this.length;i++){
+                // this.complaintId.push(data.data.list[i].pkId);
+                // console.log("id00000000000"+complaintId);
+                // this.second(data.data.list[i].tscustomer);
+              }
+               //二次调用
+              
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+           /*遍历用户名*/
+          API.complaintList.complaintNames(this.params).then(({data}) => {
+            if (data && data.code == 0) {
+              // this.technologyRecruitmentIds = data.data;
+              // this.tscustomerIds =data.data;
+              this.personnelIds =data.data;
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+      API.complaintList.teamNames(this.params).then(({data}) => {
+            if (data && data.code == 0) {
+              this.teamNameIds =data.data;
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+          this.loading = false;
+        },
+        // second:function(){
+        //   // this.loading = true;
+        //   // console.log(Id);
+        //   // var userId = Id;
+        //   //let id = {id:userId};
+        //   // console.log(userId);
+        //   console.log("=====================");
+        //   console.log(this.tscustomer.length);
+        //   var Id = 0;
+        //   for(var i = 0;i<this.tscustomer.length;i++){
+        //         Id = this.tscustomer[i];
+        //         // console.log("Id为"+Id);
+        //         console.log("22222222222222222222");
+        //         // debugger
+        //       }
+        //       var userId = Id;
+        //   console.log(Number(userId));
+        //   console.log("5555555555555555555555");
+        //   var params = {id:Number(userId)};
+        //        API.complaintList.listById(params).then(({data}) => {
+        //       console.log("打印状态吗"+data.code);
+        //     if (data && data.code == 0) {
+        //       this.data1 = data.data;
+        //       console.log(this.data1+"data1为");
+        //       this.totalCount = data.data.total;
+        //       this.length=data.data.list.length;
+        //     } else {
+        //       this.$Message.error(data.msg);
+        //     }
+        //   }).catch((data) => {
+        //     this.$Message.error('连接失败，请检查网络！');
+        //   });
+        //   this.loading = false;
+        // },
+        
+        //获取大类id
+        //   selectLevel(){
+        //   console.log("获取大类呀!");
+        //   // console.log(this.showEditForm.level);
+        //   this.params1.parentId=this.showEditForm.level;
+        //   //  console.log("this.params1.cityId="+this.params1.parentId);
+        //   // console.log("7777777777777777777777777");
+        //  //小类
+        //   API.complaintList.getLevelName(this.params1).then(({data}) => {
+        //     if (data && data.code == 0) {
+        //       this.levelNames = data.data.list;
+        //       console.log(this.levelNames)
+        //     } else {
+        //       this.$Message.error(data.msg);
+        //     }
+        //   }).catch((data) => {
+        //     this.$Message.error('连接失败，请检查网络！');
+        //   });
+
+         
+        // },
+        //责任人名字
+        // selectName(){
+        //   this
+        // },
+        pageChange(num) {
+          this.params.pageNum = num;
+          this.pageNumber=num;
+          this.init();
+        },
+        sizeChange(size) {
+          this.params.pagesize = size;
+          this.init();
+        },
+        resetData(val){
+          if (!val){
+            this.showEditForm = {
+              wangwangnum: '',
+              channel: '',
+              content: '',
+              scenerestoration:'',
+              remarks:'',
+              complaintdate:'',
+              sceneRestorationName:''
+            };
+
+          }
+        },
+        addModal(){
+          this.showAddModal=true;
+        },
+         //上传成功之后的方法
+        //   toAdd(){
+        //     let _this = this;
+        //     if(_this.url[_this.item.length-1] instanceof Array ==false){
+        //   _this.url[_this.item.length-1]=[];
+        // }
+        // _this.url[_this.item.length-1].push(file.response.data);
+        //     this.item.push(this.item.length)
+        //   },
+         
+  handleSuccess(res,file){
+    let _this = this;
+    if (res.code == 0) {
+      alert("上传中");
+        // this.complaintId = data.data;
+        let scenerestoration = file.response.data;
+        this.url = scenerestoration.url;
+        this.name = scenerestoration.name;
+        let name = this.name;
+        let url =this.url;
+        console.log("长度为"+scenerestoration);
+        console.log(name);
+        // console.log(_this.item.length-1);
+        // if(_this.url[_this.item.length-1] instanceof Array ==false){
+        //   _this.url[_this.item.length-1]=[];
+        // }
+        // _this.url[_this.item.length-1].push(file.response.data);
+        // this.item.push(this.url.length);
+        // console.log("长度为");
+        // console.log(_this.url);
+    } else {
+        alert("上传失败");
+    }
+    },
+    //上传错误回调
+    handleFormatError (file) {
+    this.$Notice.warning({
+        title: 'The file format is incorrect',
+        desc: 'File format of ' + file.name + ' is incorrect, please select jpg or png.'
+    });
+},
+ //删除文件
+           handleRemove (file) {
+                const fileList = this.$refs.upload.fileList;
+                this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
+            },
+             handleBeforeUpload () {
+                const check = this.item.length < 5;
+                if (!check) {
+                    this.$Notice.warning({
+                        title: 'Up to five pictures can be uploaded.'
+                    });
+                }
+                return check;
+             },
+             //点击删除文件
+        deleteFileModalData(params) {
+          //this.pkIds=[params.row.pkId];
+          // this.pkIds=[ ];
+          this.deleteModal=true;
+          let pkIds=this.pkIds;
+          if (typeof params.row != 'undefined') {
+            // pkIds.push(params.row.pkId);
+            this.pkIds = params.row.pkId;
+            let pkIds = this.pkIds;
+            console.log("循环啊");
+            console.log(pkIds);
+          }else {
+            this.selection.forEach( v => {
+              pkIds.push(v.pkId)
+            });
+          };
+        },
+        /* 确定删除*/
+        deletefiles(){
+          let pkIds=this.pkIds;
+          let param = {
+            "pkIds": pkIds
+          };
+          API.complaintList.deleteFile(param).then(({data}) => {
+            if (data && data.code == 0) {
+               if(this.params.pageNum > 1){
+            if (this.length==1 || this.size==this.length) {
+                this.pageNumber=this.pageNumber-1;
+                this.params.pageNum = this.pageNumber; 
+                this.init();
+            }
+            }
+             
+            } else {
+              this.$Message.error(data.msg);
+            };
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+
+        },
+        //确定上传.关闭窗口
+        uploadFileEdit(){
+          this.showEditForm.url = this.url;
+          let complaintId = this.complaintId;
+          console.log("id为");
+          console.log(complaintId);
+          let name = this.name;
+          this.showEditForm.name =name;
+          this.showEditForm.complaintId =complaintId;
+          API.complaintList.addFile(this.showEditForm).then(({data}) => {
+            if (data && data.code == 0) {
+              this.init();
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          })
+        },
+        cancelFileEdit(){this.ts = false},
+        /*取消*/
+        cancelDeleteFile(){
+          this.deleteModal=false;
+        },
+      // //上传前的事件钩子
+      // handleUpload(file){
+      //     // 选择文件后 这里判断文件类型 保存文件 自定义一个keyid 值 方便后面删除操作
+      //           let keyID = Math.random().toString().substr(2);
+      //           url['keyID'] = keyID;
+      //           // 保存文件到总展示文件数据里
+      //           this.url.push(file);
+      //           // 保存文件到需要上传的文件数组里
+      //           this.scenerestoration.push(file)
+      //           // 返回 falsa 停止自动上传 我们需要手动上传
+      //           //如果需要手动上传文件，需要把这里注释放开并放开上面代码块中的被注释的两个按钮，就可以进行手动上传了
+      //           //return false
+      // },
+      
+        //用户验证
+        yanzheng(){
+          API.complaintList.exist(this.showEditForm).then(({data}) => {
+            if (data && data.code == 0) {
+              this.init();
+            } else {
+              this.$Message.error(data.msg);
+            }
+          })
+        },
+        save(){
+          let scenerestoration = JSON.stringify(this.url);
+          this.showEditForm.scenerestoration = scenerestoration;
+          console.log(scenerestoration+"地址为:");
+          API.complaintList.insert(this.showEditForm).then(({data}) => {
+            if (data && data.code == 0) {
+              //上传文件封装成数组
+            //   if(this.url.length == 1){
+            //   this.scenerestoration = this.url[0].scenerestoration;
+            //   console.log(this.scenerestoration);
+            // }else if(this.url.length >1){
+            //   const urlList = [];
+            //   for(let j = 0;j<this.url.length;j++){
+            //     urlList.push(this.url[j].scenerestoration);
+            //     console.log("循环地址");
+            //     console.log(urlList);
+            //   }
+            //   this.scenerestoration  = urlList.join(",");
+            //   console.log("拼接地址哦!");
+            //   console.log(this.scenerestoration);
+            // }
+              this.init();
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          })
+        },
+        cancel(){
+          this.showAddModal=false;
+
+        },
+        showEditModalData(params){
+          this.showEditModal=true;
+          //大类
+          // API.complaintList.selectLevel(this.params).then(({data}) => {
+          //   if (data && data.code == 0) {
+          //     this.levels = data.data;
+              // console.log("大类");
+              // console.log(this.levels);
+          //   } else {
+          //     this.$Message.error(data.msg);
+          //   }
+          // }).catch((data) => {
+          //   this.$Message.error('连接失败，请检查网络！');
+          // });
+     /*遍历用户名*/
+          API.complaintList.complaintNames(this.params).then(({data}) => {
+            if (data && data.code == 0) {
+              // this.technologyRecruitmentIds = data.data;
+              // this.tscustomerIds =data.data;
+              this.personnelIds =data.data;
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+          /*遍历团队名*/
+         
+          if (typeof params.row != 'undefined') {
+            const Complaint = params.row;
+            this.showEditForm.pkId = Complaint.pkId;
+            this.showEditForm.wangwangnum=Complaint.wangwangnum;
+            this.showEditForm.channel = Complaint.channel;
+            //数组转取出情景还原url
+            let scenerestoration = Complaint.scenerestoration;
+            this.url = JSON.parse(scenerestoration);
+            // this.showEditForm.scenerestoration = Complaint.scenerestoration;
+            this.showEditForm.sceneRestorationName = Complaint.sceneRestorationName;
+            this.showEditForm.shopptype = Complaint.shopptype;
+            this.showEditForm.remarks = Complaint.remarks;
+            this.showEditForm.responsibility = Complaint.responsibility;
+            this.showEditForm.frequency = Complaint.frequency;
+            // this.showEditForm.level = Complaint.level;
+            // this.showEditForm.result = Complaint.result;
+            this.showEditForm.teamname=Complaint.teamname;
+            this.showEditForm.username = Complaint.username;
+            this.showEditForm.content = Complaint.content;
+            this.showEditForm.shopptype = Complaint.shopptype;
+            this.showEditForm.department = Complaint.department;
+            this.showEditForm.custtype = Complaint.custtype;
+            this.showEditForm.worktype = Complaint.worktype;
+            this.showEditForm.personnelid=Complaint.personnelid;
+            this.showEditForm.technologyRecruitmentid=Complaint.technologyRecruitmentid;
+            this.showEditForm.tscustomer=Complaint.tscustomer;
+            // this.showEditForm.parentId = Complaint.parentId;
+            this.showEditForm.complaintName = Complaint.complaintName;
+            // this.showEditForm.complaintid = Complaint.complaintid;
+            // this.showEditForm.sonId = Complaint.sonId;
+            this.showEditForm.status = Complaint.status;
+            this.showEditForm.complaintdate = Complaint.complaintdate;
+            this.showEditForm.tename=Complaint.tename;
+          }
+        },
+        reViewEditModalData(params){
+          this.reViewModal = true;
+           if (typeof params.row != 'undefined') {
+            const Complaint = params.row;
+            this.showEditForm.pkId = Complaint.pkId;
+            this.showEditForm.status = Complaint.status;
+          }
+        },
+
+        /* 删除模块，弹出弹框*/
+        delete(params) {
+          //this.pkIds=[params.row.pkId];
+          this.pkIds=[ ];
+          this.showDeleteModal=true;
+          let pkIds=this.pkIds;
+          if (typeof params.row != 'undefined') {
+            pkIds.push(params.row.pkId);
+            console.log("循环啊");
+            console.log(pkIds);
+          }else {
+            this.selection.forEach( v => {
+              pkIds.push(v.pkId)
+            });
+          };
+        },
+        /* 确定删除*/
+        saveDelete(){
+          let pkIds=this.pkIds;
+          let param = {
+            "pkIds": pkIds
+          };
+          API.complaintList.less(param).then(({data}) => {
+            if (data && data.code == 0) {
+               if(this.params.pageNum > 1){
+            if (this.length==1 || this.size==this.length) {
+                this.pageNumber=this.pageNumber-1;
+                this.params.pageNum = this.pageNumber;
+            }
+            }
+              this.init();
+            } else {
+              this.$Message.error(data.msg);
+            };
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+
+        },
+        /*取消*/
+        cancelDelete(){
+          this.showDeleteModal=false;
+        },
+        // 选择状态改变
+        selectionChange(data) {
+          this.size=data.length
+          this.selection = data;
+        },
+        saveEdit(){
+          API.complaintList.update(this.showEditForm).then(({data}) => {
+            if (data && data.code == 0) {
+              this.init();
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          })
+        },
+        cancelEdit(){
+          this.showEditModal = false;
+        },
+        //上传文件（不用了）
+        fileModal(params){
+          this.ts=true;
+          this.params.id = params.row.pkId;
+          let complaintId = this.params.id;
+          this.complaintId = complaintId;
+          console.log(complaintId+"获取的id为");
+          // this.uploadData = Vue.set(vm.uploadData,'uploadData',complaintId);
+          // this.uploadData = params.row.complaintId;
+          // let uploadData =this.uploadData;
+          // // this.uploadData={},
+          // // uploadData.push(complaintId);
+          // console.log(uploadData);
+          this.params.pageNumber = 1;
+          this.loading = false;
+        },
+        //查看文件
+        lookFileModal(params){
+          this.showFileModal=true;
+          this.params.complaintId = params.row.pkId;
+          console.log("查看文件哦");
+          console.log(this.params.complaintId);
+          this.pageNumber =1;
+          this.loading = true;
+           /*data是接口返回的data*/
+          API.complaintList.selectFiles(this.params).then(({data}) => {
+            if (data && data.code == 0) {
+              this.data3 = data.data;
+              console.log("data3为多少呀");
+              console.log(this.data3);
+              this.params.complaintId='';
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+          this.loading = false;
+        },
+        saveFileTable(){this.showFileModal=false;},
+        cancelFileTable(){this.showFileModal=false;},
+        lookModal(params){
+         
+          this.showModal=true;
+           this.params.wangwangnum = params.row.wangwangnum;
+           this.params.pageNum=1;
+          // 数据初始化
+          this.loading = true;
+          /*data是接口返回的data*/
+          API.complaintList.listByWangWangNum(this.params).then(({data}) => {
+            if (data && data.code == 0) {
+              this.data2 = data.data;
+              this.params.wangwangnum='';
+            } else {
+              this.$Message.error(data.msg);
+            }
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+          this.loading = false;
+        },
+        saveTable(){this.showModal=false;},
+        cancelTable(){this.showModal=false;}
+      }
+    }
+</script>
+
+<style>
+    .demo-upload-list{
+        display: inline-block;
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        line-height: 60px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+        position: relative;
+        box-shadow: 0 1px 1px rgba(0,0,0,.2);
+        margin-right: 4px;
+    }
+    .demo-upload-list img{
+        width: 100%;
+        height: 100%;
+    }
+    .demo-upload-list-cover{
+        display: none;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,.6);
+    }
+    .demo-upload-list:hover .demo-upload-list-cover{
+        display: block;
+    }
+    .demo-upload-list-cover i{
+        color: #fff;
+        font-size: 20px;
+        cursor: pointer;
+        margin: 0 2px;
+    }
+</style>
