@@ -657,12 +657,15 @@ import Vue from 'vue';
              {
               title: '投诉日期',
               align: 'center',
-              key: 'complaintdate'
+              key: 'complaintdate',
+              sortable: true
             },
             {
               title: '操作',
               key: 'action',
               align: 'center',
+              fixed: 'right',
+              width: 300,
               render: (h, params) => {
                 let editBtn = h('Button', {
                   props: {
@@ -857,7 +860,7 @@ import Vue from 'vue';
                       target:"_blank",
                       href: showEditForm.row.url,
                     },
-                  },showEditForm.row.name)
+                  },showEditForm.row.url)
                 ])
               }
             },
@@ -1271,10 +1274,10 @@ import Vue from 'vue';
             this.showEditForm.wangwangnum=Complaint.wangwangnum;
             this.showEditForm.channel = Complaint.channel;
             //数组转取出情景还原url
-            let scenerestoration = Complaint.scenerestoration;
-            this.url = JSON.parse(scenerestoration);
-            // this.showEditForm.scenerestoration = Complaint.scenerestoration;
-            this.showEditForm.sceneRestorationName = Complaint.sceneRestorationName;
+            // let scenerestoration = Complaint.scenerestoration;
+            // this.url = JSON.parse(scenerestoration);
+            // // this.showEditForm.scenerestoration = Complaint.scenerestoration;
+            // this.showEditForm.sceneRestorationName = Complaint.sceneRestorationName;
             this.showEditForm.shopptype = Complaint.shopptype;
             this.showEditForm.remarks = Complaint.remarks;
             this.showEditForm.responsibility = Complaint.responsibility;
@@ -1391,16 +1394,12 @@ import Vue from 'vue';
         lookFileModal(params){
           this.showFileModal=true;
           this.params.complaintId = params.row.pkId;
-          console.log("查看文件哦");
-          console.log(this.params.complaintId);
           this.pageNumber =1;
           this.loading = true;
            /*data是接口返回的data*/
           API.complaintList.selectFiles(this.params).then(({data}) => {
             if (data && data.code == 0) {
               this.data3 = data.data;
-              console.log("data3为多少呀");
-              console.log(this.data3);
               this.params.complaintId='';
             } else {
               this.$Message.error(data.msg);
