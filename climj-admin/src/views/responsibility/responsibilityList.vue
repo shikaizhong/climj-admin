@@ -33,7 +33,7 @@
             <Col span="2">
                 <Select placeholder="请选择判责类型:" filterable v-model="params.type">
                         <Option value="0">投诉</Option>
-                        <Option value="1">判责</Option>
+                        <Option value="1">隐患</Option>
                         <Option value="2">退款</Option>
                     </Select>
             </Col>
@@ -266,7 +266,7 @@
            @on-ok="detailsEdit"
            @on-cancel="detailscancelEdit"
            width="800" v-if="params.type == 0">
-            <h3 slot="header" style="color:#2D8CF0">修改信息</h3>
+            <h3 slot="header" style="color:#2D8CF0">查看投诉详情</h3>
             <Form :model="complaintIds" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
                 <Col span="12">
                     <FormItem  label="投诉客户" prop="wangwangnum" >
@@ -347,6 +347,119 @@
                 </Col>
             </form>
         </Modal>
+        <!--点击查看隐患详情-->
+        <Modal v-model="detailsModal" @on-ok="detailsEdit" @on-cancel="detailscancelEdit" width=600  v-if="params.type == 1">
+            <h3 slot="header" style="color:#2D8CF0">详情</h3>
+            <Form :model="modifierForm" label-position="right" :label-width="100" @submit.native.prevent="saveModifier" inline>
+                <div style="width:270px;float:left">
+                    <FormItem label="客户名" prop="wangWangNum">
+                        <Input disabled v-model="modifierForm.wangWangNum" style="width:150px" />
+                    </FormItem>
+                    <FormItem label="客户类型">
+                        <div>
+                            <Input disabled v-model="modifierForm.custtype" style="width:75px" />
+                            <Input disabled v-model="modifierForm.childtype" style="width:75px" />
+                        </div>
+                    </FormItem>
+                    <FormItem label="隐患日期" prop="hiddenDate">
+                        <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="modifierForm.hiddenDate=$event" style="width:150px" />
+                    </FormItem>
+                    <FormItem label="招商顾问" prop="username2">
+                        <Input disabled v-model="modifierForm.username2" style="width:120px" />
+                    </FormItem>
+                </div>
+                <div style="width:240px;float:left">
+                    <FormItem label="隐患次数" prop="frequency">
+                        <Input disabled v-model="modifierForm.frequency" style="width:120px" />
+                    </FormItem>
+                    <FormItem label="店长" prop="username1">
+                        <Input disabled v-model="modifierForm.username1" style="width:120px" />
+                    </FormItem>
+                    <FormItem label="所属团队" prop="teamname">
+                        <Input disabled v-model="modifierForm.teamname" style="width:120px" />
+                    </FormItem>
+                    <FormItem label="店铺类型" prop="shopptype">
+                        <Input disabled v-model="modifierForm.shopptype" style="width:120px" />
+                    </FormItem>
+                </div>
+                <FormItem label="隐患内容" prop="hiddenContent">
+                    <Input v-model="modifierForm.hiddenContent" type="textarea" style="width:400px" />
+                </FormItem>
+                <FormItem label="备注" prop="remark">
+                    <Input v-model="modifierForm.remark" type="textarea" style="width:400px" />
+                </FormItem>
+            </Form>
+        </Modal>
+        <!--点击查看退款详情-->
+        <Modal v-model="detailsModal" @on-ok="detailsEdit" @on-cancel="detailscancelEdit" width=752  v-if="params.type == 2">
+            <h3 slot="header" style="color:#2D8CF0">退款详情</h3>
+                <Form :model="refundForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" inline>
+                    <div style="width:210px;float:left">
+                        <FormItem label="服务期" prop="deadline">
+                            <Input disabled v-model="refundForm.deadline" style="width:120px" />
+                        </FormItem>
+                        <FormItem label="招商顾问" prop="username2">
+                            <Input disabled v-model="refundForm.username2" style="width:120px" />
+                        </FormItem>
+                        <FormItem label="合同金额" prop="turnovermoney">
+                            <Input disabled v-model="refundForm.turnovermoney" style="width:120px" />
+                        </FormItem>
+                        <FormItem label="退款金额" prop="refundAmount">
+                            <Input v-model="refundForm.refundAmount" style="width:120px" />
+                        </FormItem>
+                    </div>
+                    <div style="width:270px;float:left">
+                        <FormItem label="退款客户" prop="wangWangNum">
+                            <Input disabled v-model="refundForm.wangWangNum" style="width:150px" />
+                        </FormItem>
+
+                        <FormItem label="客户类型">
+                            <div>
+                                <Input disabled v-model="refundForm.custtype" style="width:75px" />
+                                <Input disabled v-model="refundForm.childtype" style="width:75px" />
+                            </div>
+                        </FormItem>
+
+                        <FormItem label="退款渠道" prop="refundChannel">
+                            <select v-model="refundForm.refundChannel" style="width: 160px;height:35px">
+                                <option value="1">SEM在线订购</option>
+                                <option value="2">支付宝转账</option>
+                                <option value="3">网银转账</option>
+                                <option value="4">定制市场订购</option>
+                                <option value="5">现金</option>
+                                <option value="6">POS机</option>
+                                <option value="7">京东在线订购</option>
+                                <option value="8">微信支付</Option>
+                            </select>
+                        </FormItem>
+                        <FormItem label="退款时间" prop="refundDate">
+                            <i-col span="11">
+                                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="refundForm.refundDate=$event" style="width:160px"></DatePicker>
+                            </i-col>
+                        </FormItem>
+                    </div>
+                    <div style="width:240px;float:left">
+                        <FormItem label="店铺类型" prop="shopptype">
+                            <Input disabled v-model="refundForm.shopptype" style="width:120px" />
+                        </FormItem>
+
+                        <FormItem label="店长" prop="username1  ">
+                            <Input disabled v-model="refundForm.username1" style="width:120px" />
+                        </FormItem>
+                        <FormItem label="所属团队" prop="teamname">
+                            <Input disabled v-model="refundForm.teamname" style="width:120px" />
+                        </FormItem>
+                    </div>
+                    <div style="width:500px">
+                        <FormItem label="退款原因" prop="refundCause">
+                            <Input v-model="refundForm.refundCause" style="width:500px" type="textarea" />
+                        </FormItem>
+                        <FormItem label="备注" prop="remark">
+                            <Input v-model="refundForm.remark" style="width:500px" type="textarea" />
+                        </FormItem>
+                    </div>
+                </Form>
+        </Modal>
     </div>
 </template>
 <script>
@@ -410,7 +523,7 @@ export default {
                     render: (h, params) => {
                     const row = params.row;
                     const color=row.type==0 ? 'green' :(row.type ==1 ? 'red':(row.type ==2 ?'blue':'purple'));
-                    const text=row.type==0 ? '投诉' :(row.type ==1 ? "判责":(row.type ==2? '退款':'其它'));
+                    const text=row.type==0 ? '投诉' :(row.type ==1 ? "隐患":(row.type ==2? '退款':'其他'));
                     return h('Tag', {
                     props: {
                         color: color
@@ -646,7 +759,7 @@ export default {
             deleteModal:false,
             showAddModal:false,
             detailsModal: false,
-            //点击详情
+            //点击投诉详情
             complaintIds:{
                 pkId: '',
                 wangwangnum: '',
@@ -677,6 +790,46 @@ export default {
                 url:'',
                 name:'',
                 complaintId:'',
+            },
+            //点击隐患详情
+              modifierForm: {
+                pkId: '',
+                wangWangNum: '',
+                hiddenDate: '',
+                hiddenContent: '',
+                remark: '',
+                frequency: '',
+                custtype: '',
+                childtype: '',
+                shopptype: '',
+                username1: '',
+                username2: '',
+                teamname: '',
+                status: '',
+                isDelete: '',
+                level: '',
+            },
+            //点击投诉详情
+            refundForm:{
+                pkId: '',
+                wangWangNum: '',
+                refundDate: '',
+                refundAmount: '',
+                refundChannel: '',
+                refundCause: '',
+                remark: '',
+                custtype: '',
+                childtype: '',
+                turnovermoney: '',
+                shopptype: '',
+                deadline: '',
+                username1: '',
+                username2: '',
+                // technologyrecruitmentid:'',
+                teamname: '',
+                status: '',
+                isDelete: '',
+                deadline: '',
             },
             //客诉大类别
             levels:[],
@@ -819,7 +972,6 @@ export default {
                  this.showEditForm.grade = responsibilityList.grade;
                  this.showEditForm.createTime = responsibilityList.createTime;
                  this.showEditForm.responsibilityor = responsibilityList.responsibilityor;
-                 this.showEditForm.type = responsibilityList.type;
                  this.showEditForm.summary = responsibilityList.summary;
                  this.showEditForm.basic = responsibilityList.basic;
                  this.showEditForm.complaintdate = responsibilityList.complaintdate;
@@ -841,7 +993,10 @@ export default {
            },
            //确定修改
            saveEdit(){
+               let paramss = this.params.type;
+               this.showEditForm.type = paramss;
                 API.responsibilityList.update(this.showEditForm).then(({data}) => {
+                    console.log(this.showEditForm.complaintNam+"修改后的时间");
                     if (data && data.code == 0) {
                     this.init();
                     } else {
@@ -909,15 +1064,37 @@ export default {
                 let name = this.name;
                 this.showEditForm.name =name;
                 this.showEditForm.complaintId =complaintId;
-                API.complaintList.addFile(this.showEditForm).then(({data}) => {
-                    if (data && data.code == 0) {
-                    this.init();
-                    } else {
-                    this.$Message.error(data.msg);
-                    }
-                }).catch((data) => {
-                    this.$Message.error('连接失败，请检查网络！');
-                })
+                let paramss = this.params.type;
+                //投诉上传
+                if(paramss == 0){
+                        API.complaintList.addFile(this.showEditForm).then(({data}) => {
+                        if (data && data.code == 0) {
+                        this.init();
+                        } else {
+                        this.$Message.error(data.msg);
+                        }
+                    }).catch((data) => {
+                        this.$Message.error('连接失败，请检查网络！');
+                    })
+                    //隐患上传
+                }else if(paramss == 1){
+                     API.hiddenTroubleList.addFile(this.showEditForm).then(({data}) => {
+                        if (data && data.code == 0) {
+                            this.init();
+                        } else {
+                            this.$Message.error(data.msg);
+                        }
+                    })
+                    //退款上传
+                }else{
+                     API.refundList.addFile(this.showFileForm).then(({data}) => {
+                        if (data && data.code == 0) {
+                            this.init();
+                        } else {
+                            this.$Message.error(data.msg);
+                        }
+                    })
+                }   
             },
             //取消上传
             cancelFileEdit(){
@@ -996,8 +1173,8 @@ export default {
                     console.log(params.row.pkId+"id为")
                     API.responsibilityList.selectById(this.params).then(({data}) => {
                         if (data && data.code == 0) {
-                        this.complaintIds =data.data.list[0];
-                        this.params.pkId='';
+                                this.complaintIds =data.data.list[0];
+                                this.params.pkId=''
                         } else {
                         this.$Message.error(data.msg);
                         }
@@ -1007,10 +1184,36 @@ export default {
                     this.loading = false;
                 //1是隐患
                 }else if(paramss ==1){
-
+                    this.params.pkId = params.row.pkId;
+                    console.log(params.row.pkId+"id为")
+                    API.responsibilityList.selectById(this.params).then(({data}) => {
+                        if (data && data.code == 0) {
+                                this.modifierForm =data.data.list[0];
+                                console.log(this.modifierForm+"实体为");    
+                                this.params.pkId=''
+                        } else {
+                        this.$Message.error(data.msg);
+                        }
+                    }).catch((data) => {
+                        this.$Message.error('连接失败，请检查网络！');
+                    });
+                    this.loading = false;
                 //2是退款
                 }else{
-                    
+                    this.params.pkId = params.row.pkId;
+                    console.log(params.row.pkId+"id为")
+                    API.responsibilityList.selectById(this.params).then(({data}) => {
+                        if (data && data.code == 0) {
+                                this.refundForm = data.data.list[0];
+                                console.log(this.refundForm+"实体为");
+                                this.params.pkId=''
+                        } else {
+                        this.$Message.error(data.msg);
+                        }
+                    }).catch((data) => {
+                        this.$Message.error('连接失败，请检查网络！');
+                    });
+                    this.loading = false;
                 }
             },
             //点击确定按钮

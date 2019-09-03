@@ -8,7 +8,9 @@ import Menu from '@/views/menus/Menu';
 //import HelloWorld from '@/components/HelloWorld';
 import Druid from '@/views/druid/Druid';
 import ComplaintList from '@/views/complaint/ComplaintList';
-import responsibilityList from '@/views/responsibility/responsibilityList';
+import ResponsibilityList from '@/views/responsibility/ResponsibilityList';
+import RefundList from '@/views/refund/RefundList';
+import HiddenTroubleList from '@/views/hiddenTrouble/HiddenTroubleList';
 Vue.use(Router)
  
 export default new Router({
@@ -27,7 +29,9 @@ export default new Router({
         {path: '/menu', component: Menu},
         {path: '/druid', component: Druid},
         {path:'/complaintList',component:ComplaintList},
-        {path: '/responsibilityList',component:responsibilityList},
+        {path: '/responsibilityList',component:ResponsibilityList},
+        {path:'/refundList',component:RefundList},
+        {path: '/hiddenTroubleList', component:HiddenTroubleList},
       ]
     }
   ]
