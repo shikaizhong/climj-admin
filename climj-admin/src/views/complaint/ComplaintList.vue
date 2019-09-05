@@ -1143,14 +1143,17 @@ import Vue from 'vue';
           };
           API.complaintList.deleteFile(param).then(({data}) => {
             if (data && data.code == 0) {
-               if(this.params.pageNum > 1){
-            if (this.length==1 || this.size==this.length) {
-                this.pageNumber=this.pageNumber-1;
-                this.params.pageNum = this.pageNumber; 
-                this.init();
+              API.complaintList.selectFiles(this.showEditForm).then(({data}) => {
+            if (data && data.code == 0) {
+              this.data3 = data.data;
+              // this.params.complaintId='';
+            } else {
+              this.$Message.error(data.msg);
             }
-            }
-             
+          }).catch((data) => {
+            this.$Message.error('连接失败，请检查网络！');
+          });
+
             } else {
               this.$Message.error(data.msg);
             };
@@ -1394,6 +1397,7 @@ import Vue from 'vue';
         lookFileModal(params){
           this.showFileModal=true;
           this.params.complaintId = params.row.pkId;
+          this.showEditForm.complaintId = params.row.pkId;
           this.pageNumber =1;
           this.loading = true;
            /*data是接口返回的data*/

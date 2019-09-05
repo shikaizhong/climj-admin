@@ -19,12 +19,11 @@
         </Col>
 
         <!-- 日期查询 -->
-        <Col span="2" style="margin-left: 20px">
-        <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="params.startTime=$event" placeholder="开始时间" style="width: 200px"></DatePicker> -->
-        <date-picker type="date" style="width:100px" format="yyyy-MM-dd 00:00:00" @on-change="params.startTime=$event" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
+        <Col span="4" style="margin-left: 20px">
+        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 00:00:00" v-model="params.startTime" @on-change="params.startTime=$event" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <date-picker type="date" style="width:100px" format="yyyy-MM-dd 23:59:59" @on-change="params.endTime=$event" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
+        <Col span="4" style="margin-left: 10px">
+        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 23:59:59" @on-change="params.endTime=$event" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
         </Col>
 
         <!-- <Col>
@@ -35,7 +34,7 @@
 
         <!-- 查询 -->
         <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.wangWangNum" style="width:120px" placeholder="请输入客户名" :clearable="isClearAble" />
+        <Input v-model="params.wangwangnum" style="width:120px" placeholder="请输入客户名" :clearable="isClearAble" />
         </Col>
         <Col span="2" style="margin-left: 10px">
         <Input v-model="params.shopptype" style="width:120px" placeholder="请输入店铺类型" :clearable="isClearAble" />
@@ -76,11 +75,11 @@
     <Modal v-model="showAddModal" @on-ok="save" @on-cancel="cancel">
         <h3 slot="header" style="color:#2D8CF0">增加信息</h3>
         <Form :model="showAddForm" ref="form1" resetFields label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" :rules="addForm">
-            <FormItem label="隐患客户" prop="wangWangNum">
-                <Input v-model="showAddForm.wangWangNum" placeholder="请输入隐患客户" style="width: 300px" @on-blur="add" :clearable="isClearAble" />
+            <FormItem label="隐患客户" prop="wangwangnum">
+                <Input v-model="showAddForm.wangwangnum" placeholder="请输入隐患客户" style="width: 300px" @on-blur="add" :clearable="isClearAble" />
             </FormItem>
-            <FormItem label="隐患日期" prop="hiddenDate">
-                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="showAddForm.hiddenDate" @on-change="showAddForm.hiddenDate=$event" placeholder="隐患时间，若不填，获取当前日期时间" style="width: 300px"></DatePicker>
+            <FormItem label="隐患日期" prop="hDate">
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showAddForm.hDate" placeholder="隐患时间，若不填，获取当前日期时间" style="width: 300px"></DatePicker>
             </FormItem>
             <FormItem label="隐患原因" prop="hiddenContent">
                 <Input v-model="showAddForm.hiddenContent" placeholder="请输入隐患原因" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble" />
@@ -100,8 +99,8 @@
         <h3 slot="header" style="color:#2D8CF0">修改信息</h3>
         <Form :model="modifierForm" label-position="right" :label-width="100" @submit.native.prevent="saveModifier" inline>
             <div style="width:270px;float:left">
-                <FormItem label="客户名" prop="wangWangNum">
-                    <Input disabled v-model="modifierForm.wangWangNum" style="width:150px" />
+                <FormItem label="客户名" prop="wangwangnum">
+                    <Input disabled v-model="modifierForm.wangwangnum" style="width:150px" />
                 </FormItem>
                 <FormItem label="客户类型">
                     <div>
@@ -109,8 +108,8 @@
                         <Input disabled v-model="modifierForm.childtype" style="width:75px" />
                     </div>
                 </FormItem>
-                <FormItem label="隐患日期" prop="hiddenDate">
-                     <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="modifierForm.hiddenDate=$event" style="width:180px" />
+                <FormItem label="隐患日期" prop="hDate">
+                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="modifierForm.hDate" style="width:180px"></DatePicker>
                 </FormItem>
                 <FormItem label="招商顾问" prop="username2">
                     <Input disabled v-model="modifierForm.username2" style="width:120px" />
@@ -155,8 +154,8 @@
         <h3 slot="header" style="color:#2D8CF0">详情</h3>
         <Form :model="modifierForm" label-position="right" :label-width="100" @submit.native.prevent="saveModifier" inline>
             <div style="width:270px;float:left">
-                <FormItem label="客户名" prop="wangWangNum">
-                    <Input disabled v-model="modifierForm.wangWangNum" style="width:150px" />
+                <FormItem label="客户名" prop="wangwangnum">
+                    <Input disabled v-model="modifierForm.wangwangnum" style="width:150px" />
                 </FormItem>
                 <FormItem label="客户类型">
                     <div>
@@ -165,7 +164,7 @@
                     </div>
                 </FormItem>
                 <FormItem label="隐患日期" prop="hiddenDate">
-                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="modifierForm.hiddenDate=$event" style="width:150px" />
+                    <DatePicker type="datetime" readonly disabled format="yyyy-MM-dd HH:mm" v-model="modifierForm.hiddenDate" style="width:180px"></DatePicker>
                 </FormItem>
                 <FormItem label="招商顾问" prop="username2">
                     <Input disabled v-model="modifierForm.username2" style="width:120px" />
@@ -186,10 +185,10 @@
                 </FormItem>
             </div>
             <FormItem label="隐患内容" prop="hiddenContent">
-                <Input v-model="modifierForm.hiddenContent" type="textarea" style="width:400px" />
+                <Input disabled v-model="modifierForm.hiddenContent" type="textarea" style="width:400px" />
             </FormItem>
             <FormItem label="备注" prop="remark">
-                <Input v-model="modifierForm.remark" type="textarea" style="width:400px" />
+                <Input disabled v-model="modifierForm.remark" type="textarea" style="width:400px" />
             </FormItem>
         </Form>
     </Modal>
@@ -231,7 +230,7 @@ export default {
             params: {
                 pageNum: 1,
                 pageSize: 10,
-                wangWangNum: '',
+                wangwangnum: '',
                 shopptype: '',
                 username1: '',
                 username2: '',
@@ -255,15 +254,15 @@ export default {
             fileModal:false,
             showDeleteFileModal: false,
             showAddForm: {
-                wangWangNum: '',
-                hiddenDate: '',
+                wangwangnum: '',
+                hDate: '',
                 hiddenContent: '',
                 remark: '',
             },
             modifierForm: {
                 pkId: '',
-                wangWangNum: '',
-                hiddenDate: '',
+                wangwangnum: '',
+                hDate: '',
                 hiddenContent: '',
                 remark: '',
                 custtype: '',
@@ -276,6 +275,7 @@ export default {
                 status: '',
                 isDelete: '',
                 level: '',
+                hiddenDate:''
             },
             showFileForm: {
                 url: '',
@@ -287,7 +287,7 @@ export default {
 
             //表单验证(如果为空就会提示)
             addForm: {
-                wangWangNum: [{
+                wangwangnum: [{
                         required: true,
                         message: '请输入退款客户',
                         trigger: 'blur'
@@ -307,7 +307,7 @@ export default {
                 {
                     title: '客户名',
                     align: 'center',
-                    key: 'wangWangNum'
+                    key: 'wangwangnum'
                 },
                 {
                     title: '隐患日期',
@@ -450,10 +450,11 @@ export default {
                     }
                 }
             ],
+            //详情表格
             columns2: [{
                     title: '客户名',
                     align: 'center',
-                    key: 'wangWangNum'
+                    key: 'wangwangnum'
                 },
                 {
                     title: '隐患日期',
@@ -710,7 +711,8 @@ export default {
         // 根据旺旺名查询历史记录
         lookModal(params) {
             this.historyModal = true;
-            this.params.wangWangNum = params.row.wangWangNum;
+            this.params.wangwangnum = params.row.wangwangnum;
+            // console.log("1111111111111111111111111旺旺名:"+this.params.wangwangnum);
             this.params.pageNum = 1;
             // 数据初始化
             this.loading = true;
@@ -720,7 +722,7 @@ export default {
                 if (data && data.code == 0) {
                     this.data2 = data.data;
                     // console.log("data2"+this.data2);
-                    this.params.wangWangNum = '';
+                    this.params.wangwangnum = '';
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -787,7 +789,13 @@ export default {
                 this.modifierForm.username1 = HiddenTrouble.username1;
                 this.modifierForm.username2 = HiddenTrouble.username2;
                 this.modifierForm.shopptype = HiddenTrouble.shopptype;
-                this.modifierForm.wangWangNum = HiddenTrouble.wangWangNum;
+                this.modifierForm.hiddenDate = HiddenTrouble.hiddenDate;
+                // console.log("获取的时间为："+HiddenTrouble.hiddenDate);
+                // console.log("获取的时间1为："+HiddenTrouble.hDate);
+                this.modifierForm.hDate = HiddenTrouble.hiddenDate;
+                // console.log("获取的时间2为："+this.modifierForm.hDate);
+                this.modifierForm.wangwangnum = HiddenTrouble.wangwangnum;
+                // console.log("旺旺名为："+ HiddenTrouble.wangwangnum);
                 this.modifierForm.hiddenContent = HiddenTrouble.hiddenContent;
                 this.modifierForm.remark = HiddenTrouble.remark;
                 this.modifierForm.frequency = HiddenTrouble.frequency;
@@ -823,8 +831,10 @@ export default {
                 this.modifierForm.teamname = HiddenTrouble.teamname;
                 this.modifierForm.username1 = HiddenTrouble.username1;
                 this.modifierForm.username2 = HiddenTrouble.username2;
+                this.modifierForm.hDate = HiddenTrouble.hDate;
                 this.modifierForm.shopptype = HiddenTrouble.shopptype;
-                this.modifierForm.wangWangNum = HiddenTrouble.wangWangNum;
+                this.modifierForm.hiddenDate = HiddenTrouble.hiddenDate;
+                this.modifierForm.wangwangnum = HiddenTrouble.wangwangnum;
                 this.modifierForm.hiddenContent = HiddenTrouble.hiddenContent;
                 this.modifierForm.remark = HiddenTrouble.remark;
                 this.modifierForm.frequency = HiddenTrouble.frequency;

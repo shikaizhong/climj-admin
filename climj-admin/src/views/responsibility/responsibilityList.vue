@@ -193,8 +193,8 @@
                 </FormItem>
             </Col>
             <Col span="12">
-                <FormItem label="判责日期" prop="createTime">
-                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.createTime" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
+                <FormItem label="判责日期" prop="hDate">
+                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.hDate" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
                     <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" @on-change="modifierForm.hiddenDate=$event" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker> -->
                 </FormItem>
             </Col>
@@ -234,7 +234,7 @@
                   :on-success="handleSuccess"
                   :on-format-error="handleFormatError"
                   :multiple="true"
-                  action="http://localhost:8090/sys/complaint/uploads" 
+                  action="http://192.168.1.112:9090/mj-admin/sys/complaint/uploads" 
                   style="display: inline-block;width:58px;">
                   <div style="width: 58px;height:58px;line-height: 58px;">
                       <Icon type="ios-camera" size="30"></Icon>
@@ -790,9 +790,10 @@ export default {
                 url:'',
                 name:'',
                 complaintId:'',
+                hDate:'',
             },
             //点击隐患详情
-              modifierForm: {
+            modifierForm: {
                 pkId: '',
                 wangWangNum: '',
                 hiddenDate: '',
@@ -808,6 +809,7 @@ export default {
                 status: '',
                 isDelete: '',
                 level: '',
+                hDate:'',
             },
             //点击投诉详情
             refundForm:{
@@ -830,6 +832,7 @@ export default {
                 status: '',
                 isDelete: '',
                 deadline: '',
+                hDate:'',
             },
             //客诉大类别
             levels:[],
@@ -971,6 +974,7 @@ export default {
                  this.showEditForm.responsibilityer = responsibilityList.responsibilityer;
                  this.showEditForm.grade = responsibilityList.grade;
                  this.showEditForm.createTime = responsibilityList.createTime;
+                 this.showEditForm.hDate = responsibilityList.createTime;
                  this.showEditForm.responsibilityor = responsibilityList.responsibilityor;
                  this.showEditForm.summary = responsibilityList.summary;
                  this.showEditForm.basic = responsibilityList.basic;
@@ -1104,6 +1108,7 @@ export default {
             lookFileModal(params){
                 this.showFileModal = true;
                 this.params.complaintId = params.row.pkId;
+                this.showEditForm.complaintId = params.row.pkId;
                 this.pageNumber =1;
                 this.loading = true;
                 /*data是接口返回的data*/
@@ -1143,13 +1148,16 @@ export default {
                 };
                 API.complaintList.deleteFile(param).then(({data}) => {
                     if (data && data.code == 0) {
-                        if(this.params.pageNum > 1){
-                            if (this.length==1 || this.size==this.length) {
-                                this.pageNumber=this.pageNumber-1;
-                                this.params.pageNum = this.pageNumber; 
-                                this.init();
+                         API.complaintList.selectFiles(this.showEditForm).then(({data}) => {
+                            if (data && data.code == 0) {
+                            this.data3 = data.data;
+                            this.params.complaintId='';
+                            } else {
+                            this.$Message.error(data.msg);
                             }
-                        }
+                        }).catch((data) => {
+                            this.$Message.error('连接失败，请检查网络！');
+                        })
                     } else {
                     this.$Message.error(data.msg);
                     };

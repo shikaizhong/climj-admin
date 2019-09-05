@@ -79,7 +79,7 @@
         <h3 slot="header" style="color:#2D8CF0">上传文件</h3>
 
         <template>
-            <Upload ref="upload" name="file" :show-upload-list="false" :on-success="handleSuccess" :multiple="true" action="http://localhost:8090/sys/refund/uploads" style="display: inline-block;width:58px;">
+            <Upload ref="upload" name="file" :show-upload-list="false" :on-success="handleSuccess" :multiple="true" action="http://192.168.1.112:9090/mj-admin/sys/refund/uploads" style="display: inline-block;width:58px;">
                 <div style="width: 58px;height:58px;line-height: 58px;">
                     <Icon type="ios-camera" size="30"></Icon>
                 </div>
@@ -109,8 +109,8 @@
             <FormItem label="退款客户" prop="wangWangNum">
                 <Input v-model="showAddForm.wangWangNum" placeholder="请输入退款客户" style="width: 300px" @on-blur="add" :clearable="isClearAble" />
             </FormItem>
-            <FormItem label="退款日期" prop="refundDate">
-                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="showAddForm.refundDate" @on-change="showAddForm.refundDate=$event" placeholder="退款时间，若不填，获取当前日期时间" style="width: 300px"></DatePicker>
+            <FormItem label="退款日期" prop="hDate">
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showAddForm.hDate" placeholder="退款时间，若不填，获取当前日期时间" style="width: 300px"></DatePicker>
             </FormItem>
             <FormItem label="退款金额" prop="refundAmount">
                 <Input v-model="showAddForm.refundAmount" placeholder="请输入退款金额" style="width: 300px" :clearable="isClearAble" />
@@ -167,7 +167,7 @@
                     <Input disabled v-model="showEditForm.turnovermoney" style="width:120px" />
                 </FormItem>
                 <FormItem label="退款金额" prop="refundAmount">
-                    <Input v-model="showEditForm.refundAmount" style="width:120px" />
+                    <Input disabled v-model="showEditForm.refundAmount" style="width:120px" />
                 </FormItem>
                 <!-- <FormItem label="场景还原" prop="scenarioReduction">
                     <Upload ref="upload" name="file" action="http://localhost:8090/sys/refund/upload" :on-success="handleSuccess" :on-format-error="handleFormatError">
@@ -188,7 +188,7 @@
                 </FormItem>
 
                 <FormItem label="退款渠道" prop="refundChannel">
-                    <select v-model="showEditForm.refundChannel" style="width: 160px;height:35px">
+                    <select v-model="showEditForm.refundChannel" disabled style="width: 160px;height:35px">
                         <option value="1">SEM在线订购</option>
                         <option value="2">支付宝转账</option>
                         <option value="3">网银转账</option>
@@ -199,9 +199,9 @@
                         <option value="8">微信支付</Option>
                     </select>
                 </FormItem>
-                <FormItem label="退款时间" prop="refundDate">
+                <FormItem label="退款时间" prop="hDate">
                     <i-col span="11">
-                        <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="showEditForm.refundDate=$event" style="width:160px"></DatePicker>
+                        <DatePicker type="datetime" readonly disabled format="yyyy-MM-dd HH:mm" v-model="showEditForm.hDate" style="width:160px"></DatePicker>
                     </i-col>
                 </FormItem>
             </div>
@@ -220,10 +220,10 @@
             </div>
             <div style="width:500px">
                 <FormItem label="退款原因" prop="refundCause">
-                    <Input v-model="showEditForm.refundCause" style="width:500px" type="textarea" />
+                    <Input disabled v-model="showEditForm.refundCause" style="width:500px" type="textarea" />
                 </FormItem>
                 <FormItem label="备注" prop="remark">
-                    <Input v-model="showEditForm.remark" style="width:500px" type="textarea" />
+                    <Input disabled v-model="showEditForm.remark" style="width:500px" type="textarea" />
                 </FormItem>
             </div>
             <!-- <FormItem label="场景还原" prop="scenarioReduction">
@@ -281,8 +281,8 @@
                         <option value="8">微信支付</Option>
                     </select>
                 </FormItem>
-                <FormItem label="退款日期" prop="refundDate">
-                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="showEditForm.refundDate" @on-change="showEditForm.refundDate=$event" style="width:200px"></DatePicker>
+                <FormItem label="退款日期" prop="hDate">
+                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.hDate" style="width:200px"></DatePicker>
                 </FormItem>
 
             </div>
@@ -382,6 +382,7 @@ export default { //主方法
                 refundChannel: '',
                 refundCause: '',
                 remark: '',
+                hDate:'',
             },
             showEditForm: {
                 pkId: '',
@@ -408,7 +409,7 @@ export default { //主方法
             showFileForm: {
                 url: '',
                 name: '',
-                relevanceId: '',
+                complaintId: '',
             },
 
             //表单验证(如果为空就会提示)
@@ -857,7 +858,7 @@ export default { //主方法
                     pkId: '',
                     name: '',
                     url: '',
-                    relevanceId: '',
+                    complaintId: '',
                 };
             }
         },
@@ -869,8 +870,9 @@ export default { //主方法
         uploadAdd(params, showFileForm) {
             this.ts = true;
             // this.params.id = params.row.pkId;
-            let relevanceId = params.row.pkId;
-            this.showFileForm.relevanceId = relevanceId;
+            let complaintId = params.row.pkId;
+            this.showFileForm.complaintId = complaintId;
+            console.log("11111111111111111111111complaintId为:"+complaintId);
             // params2.refundId = refundId;
             // console.log("111111111111:" + refundId);
             // console.log("fowrjoejri30918498240:" + this.showFileForm.refundId);
@@ -963,7 +965,6 @@ export default { //主方法
         //调用修改接口
         saveEdit() {
             // console.log("进入修改");
-            // console.log("444444444444444444:"+this.showEditForm.refundData);
             API.refundList.update(this.showEditForm).then(({
                 data
             }) => {
@@ -972,26 +973,9 @@ export default { //主方法
                 } else {
                     this.$Message.error(data.msg);
                 }
-                this.$refs.form2.resetFields();
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             })
-            // // this.showFileForm.refundId = params.row.pkId;
-            // this.loading = true;
-            // //调用接口
-            // API.refundList.listFile(this.showFileForm).then(({data}) => {
-            //     if (data && data.code == 0) {
-            //         console.log("pkId为：" + this.showFileForm.refundId);
-            //         this.data3 = data.data;
-            //         // console.log("data2"+this.data2);
-
-            //     } else {
-            //         this.$Message.error(data.msg);
-            //     }
-            // }).catch((data) => {
-            //     this.$Message.error('连接失败，请检查网络！');
-            // });
-            // this.loading = false;
         },
         cancelEdit() {
             this.showEditModal = false;
@@ -1008,22 +992,22 @@ export default { //主方法
             this.showEditModalAll = true;
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
-                // console.log(Refund.refundDate+"时间为1");
                 this.showEditForm.pkId = Refund.pkId;
                 this.showEditForm.wangWangNum = Refund.wangWangNum;
-                this.showEditForm.refundDate = Refund.refundDate;
                 this.showEditForm.refundChannel = Refund.refundChannel;
-                // this.showEditForm.scenarioReduction = Refund.scenarioReduction;
+                this.showEditForm.scenarioReduction = Refund.scenarioReduction;
                 this.showEditForm.remark = Refund.remark;
                 this.showEditForm.refundAmount = Refund.refundAmount;
                 this.showEditForm.status = Refund.status;
                 this.showEditForm.isDelete = Refund.isDelete;
+                this.showEditForm.hDate = Refund.refundDate; 
                 this.showEditForm.refundCause = Refund.refundCause;
                 this.showEditForm.level = Refund.level;
                 this.showEditForm.custtype = Refund.custtype;
                 this.showEditForm.childtype = Refund.childtype;
-                this.showEditForm.technologyrecruitmentid = Refund.technologyrecruitmentid;
                 this.showEditForm.turnovermoney = Refund.turnovermoney;
+                console.log("详情:退款金额为1111111111111111111:"+Refund.turnovermoney);
+                console.log("详情:退款金额为2222222222222222222:"+this.showEditForm.turnovermoney);
                 this.showEditForm.teamname = Refund.teamname;
                 this.showEditForm.serverdeadline = Refund.serverdeadline;
                 this.showEditForm.serverdeadlineend = Refund.serverdeadlineend;
@@ -1034,44 +1018,27 @@ export default { //主方法
             }
         },
 
-        // showByWang(){
-        //     API.refundList.ByWang(showAddForm.wangWangNum)
-        // },
-
-        //获取添加退款旺旺的值
-        // add(params){
-        //     console.log("sjkfhklsfskjsfjkjkjkkkkkkkkkkkk:"+params);
-        //     console.log("sjkfhklsfskjsfjkjkjkkkkkkkkkkkk:"+this.showAddForm.wangWangNum);
-        //     const Refund = params.row;
-        //     console.log("1212121:"+params.row);
-        //     this.showEditForm.wangWangNum = Refund.wangWangNum;
-        //     console.log("dfjkhasfjjksajfjkahdlfjdaifjkj:"+this.showEditForm.wangWangNum);
-        // },
-
         //修改
         showEditModalData(params) {
             this.showEditModal = true;
-            this.showFileForm.relevanceId = params.row.pkId;
-            // console.log("111111111111:"+params.row.pkId);
-            // console.log("222222222222:"+this.showFileForm.refundId);
+            this.showFileForm.complaintId = params.row.pkId;
+            // console.log("值为:"+params.row.pkId);
+            // console.log("22222222222222222222conplaintId值为:"+this.showFileForm.complaintId);
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
-                // console.log(Refund.refundDate+"时间为1");
                 this.showEditForm.pkId = Refund.pkId;
                 this.showEditForm.wangWangNum = Refund.wangWangNum;
-                // this.showEditForm.refundDate = Refund.refundDate;
-                // console.log("弟弟：" + Refund.refundDate);
                 this.showEditForm.refundChannel = Refund.refundChannel;
                 this.showEditForm.scenarioReduction = Refund.scenarioReduction;
                 this.showEditForm.remark = Refund.remark;
                 this.showEditForm.refundAmount = Refund.refundAmount;
                 this.showEditForm.status = Refund.status;
                 this.showEditForm.isDelete = Refund.isDelete;
+                this.showEditForm.hDate = Refund.refundDate; 
                 this.showEditForm.refundCause = Refund.refundCause;
                 this.showEditForm.level = Refund.level;
                 this.showEditForm.custtype = Refund.custtype;
                 this.showEditForm.childtype = Refund.childtype;
-                // this.showEditForm.technologyrecruitmentid = Refund.technologyrecruitmentid;
                 this.showEditForm.turnovermoney = Refund.turnovermoney;
                 this.showEditForm.teamname = Refund.teamname;
                 this.showEditForm.serverdeadline = Refund.serverdeadline;
@@ -1080,6 +1047,8 @@ export default { //主方法
                 this.showEditForm.username1 = Refund.username1;
                 this.showEditForm.username2 = Refund.username2;
                 this.showEditForm.shopptype = Refund.shopptype;
+                // console.log("修改:退款金额为1111111111111111111:"+Refund.turnovermoney);
+                // console.log("修改:退款金额为2222222222222222222:"+this.showEditForm.turnovermoney);
             }
         },
 
@@ -1139,7 +1108,8 @@ export default { //主方法
         saveFileDelete() {
             // this.showDeleteFileModal = true;
             let pkId = this.showFileForm.pkId;
-            let relevanceId = this.showFileForm.relevanceId;
+            let complaintId = this.showFileForm.complaintId;
+            // console.log("333333333333333333333conplaintId值为:"+complaintId);
             API.refundList.deleteFile(this.showFileForm).then(({
                 data
             }) => {
@@ -1172,36 +1142,16 @@ export default { //主方法
             this.showDeleteFileModal = false;
         },
 
-        // andleRemove(file) {
-        //     const fileList = this.$refs.upload.fileList;
-        //     this.$refs.upload.fileList.splice(fileList.indexOf(file), 1);
-        // },
-
         // 选择状态改变
         selectionChange(data) {
             this.size = data.length
             this.selection = data;
         },
 
-        //旺旺名查其他
-        // saveTable() {
-        //     API.refundList.listByWangWangNum(wangWangNum).then(({
-        //         data2
-        //     }) => {
-        //         if (data && data.code == 0) {
-        //             this.init();
-        //         } else {
-        //             this.$Message.error(data.msg);
-        //         }
-        //     }).catch((data2) => {
-        //         this.$Message.error('连接失败，请检查网络！');
-        //     })
-        // },
-
         showFileFormList(params) {
             this.fileModal = true;
-            this.showFileForm.relevanceId = params.row.pkId;
-            // console.log("refundId为：" + this.showFileForm.refundId);
+            this.showFileForm.complaintId = params.row.pkId;
+            // console.log("4444444444444444444444refundId为：" + this.showFileForm.refundId);
             API.refundList.listFile(this.showFileForm).then(({
                 data
             }) => {
@@ -1215,27 +1165,6 @@ export default { //主方法
             });
             this.loading = false;
         },
-
-        //通过refundId查询文件列表
-        // fileList(params) {
-        //     console.log("pkid为1："+params.row.pkId);
-        //     this.showFileForm.refundId = params.row.pkId;
-        //     // this.loading = true;
-        //     //调用接口
-        //     API.refundList.listFile(this.showFileForm).then(({data}) => {
-        //         if (data && data.code == 0) {
-        //             console.log("pkId为2：" + this.showFileForm.refundId);
-        //             this.data3 = data.data;
-        //             // console.log("data2"+this.data2);
-
-        //         } else {
-        //             this.$Message.error(data.msg);
-        //         }
-        //     }).catch((data) => {
-        //         this.$Message.error('连接失败，请检查网络！');
-        //     });
-        //     // this.loading = false;
-        // },
 
         //通过wangWangNum查询
         lookModal(params) {
