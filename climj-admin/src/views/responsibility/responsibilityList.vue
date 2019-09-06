@@ -9,23 +9,24 @@
                 </Select>
             </Col>
             <Col span="4" push=1>
-                <Select @on-change="searchComplaint" v-model="params.PersonnelID" placeholder="选择签约人" clearable filterable>
+                <Select @on-change="searchComplaint" v-model="params.PersonnelID" placeholder="选择签约人" number clearable filterable>
                     <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
                     {{teamNameId.username}}
                     </Option>
                 </Select>
             </Col>
             <Col span="4" push=1>
-                <Input placeholder="选择店长组别"  v-model="params.TeamName"  size="large"  @click="searchComplaint" clearable/>
+                <Input placeholder="选择店长组别"  v-model="params.TeamName"  size="large"  @on-change="searchComplaint" clearable filterablea/>
             </Col>
             <Col span="4">
-                <Select placeholder="判责结果:" style="width: 300px;height:35px" v-model="params.result"  @on-change="searchComplaint">
+                <Select placeholder="判责结果:" style="width: 300px;height:35px" v-model="params.result"  @on-change="searchComplaint" clearable filterablea>
                         <Option value="0">微责</Option>
                         <Option value="1">无责</Option>
                         <Option value="2">待定</Option>
                         <Option value="3">轻责</Option>
                         <Option value="4">中责</Option>
                         <Option value="5">重责</Option>
+                        <Option value="-1">全部</Option>
                     </Select>
             </Col>
         </Row>
@@ -176,7 +177,7 @@
            
             <Col span="12">
                 <FormItem  label="处理方案:" prop="deal" >
-                    <Input placeholder="请输入处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}"  style="width: 300px" v-model="showEditForm.deal"/>
+                    <Input placeholder="请输入处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}"  style="width: 300px" v-model="showEditForm.deal" disabled/>
                 </FormItem>
             </Col>
             <Col span="12">
@@ -867,7 +868,7 @@ export default {
                 serverdeadline:'',
                 personnelid:'',
                 pname:'',
-                pteamname:'',
+                pteamname:''
             },
         }
     },

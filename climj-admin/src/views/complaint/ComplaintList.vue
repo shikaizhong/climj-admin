@@ -41,12 +41,12 @@
           </Select>
       </col>
       <Col span="4" style="margin-left: 0px">
-        <i-select @on-change="searchComplaint" v-model="params.status" placeholder="选择状态" filterable style="width:200px" clearable>
+        <Select @on-change="searchComplaint" v-model="params.status" placeholder="选择状态" style="width:200px" clearable filterable>
         <Option value="0">待审核</Option>
         <Option value="1">已审核</Option>
         <Option value="2">待审定</Option>
         <Option value="-1">全部</Option>
-      </i-select>
+      </Select>
       </Col>
         <Col span="4">
             <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" placeholder="开始时间" style="width: 200px"></DatePicker>
@@ -103,7 +103,9 @@
     <Modal v-model="showAddModal"
            @on-ok="save"
            @on-cancel="cancel"
-           @on-visible-change="resetData">
+           @on-visible-change="resetData"
+           draggable
+           scrollable>
       <h3 slot="header" style="color:#2D8CF0">增加信息</h3>
       <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" :rules="addForm">
         <!-- <FormItem  label="ID" prop="pkId" >
@@ -126,6 +128,74 @@
                 <Option value="8">其他</Option>
             </Select>
         </FormItem>
+        
+         <FormItem  label="店铺近30天成交额" prop="turnover" >
+          <Input v-model="showEditForm.turnover"
+                 placeholder="店铺近30天成交额" style="width: 300px" :clearable="isClearAble"/>
+        </FormItem>
+       <FormItem  label="店铺近30天成交笔数" prop="number" >
+          <Input v-model="showEditForm.number"
+                 placeholder="店铺近30天成交笔数" style="width: 300px" :clearable="isClearAble"/>
+        </FormItem>
+         <FormItem  label="店铺行业" prop="industry" >
+          <Select v-model="showEditForm.industry" style="width: 300px"  placeholder="请选择投诉渠道" clearable filterable>
+                <Option value="1">3c数码配件</Option>
+                <Option value="2">MP3/MP4/ipod/录音笔</Option>
+                <Option value="3">ZIPPO/瑞士军刀/眼镜</Option>
+                <Option value="4">办公设备/耗材/相关服务</Option>
+                <Option value="5">保健品/膳食营养补充食品</Option>
+                <Option value="6">本地优化生活服务</Option>
+                <Option value="7">笔记本电脑</Option>
+                <Option value="8">彩妆/香水/美妆工具</Option>
+                <Option value="9">餐饮具</Option>
+                <Option value="10">餐饮美食</Option>
+                <Option value="11">茶/咖啡/冲印</Option>
+                <Option value="12">超市卡/商场购物卡</Option>
+                <Option value="13">成人用品/避孕/计生用品</Option>
+                <Option value="14">宠物/宠物食品及用品</Option>
+                <Option value="15">厨房/烹饪用具</Option>
+                <Option value="16">厨房电器</Option>
+                <Option value="17">传统滋补营养品</Option>
+                <Option value="18">床上用品</Option>
+                <Option value="19">大家电</Option>
+                <Option value="20">电脑硬件/显示器/电脑周边</Option>
+                <Option value="21">电玩/配件/游戏/攻略</Option>
+                <Option value="22">电影/演出/体育赛事</Option>
+                <Option value="23">电子/电工</Option>
+                <Option value="24">电子词典/电纸书/文化用品</Option>
+                <Option value="25">度假旅游/签证送关/旅游服务</Option>
+                <Option value="26">服饰配件/皮带/帽子/围巾</Option>
+                <Option value="27">服务市场</Option>
+                <Option value="28">个人护理/保健/按摩器材</Option>
+                <Option value="29">个性定制/设计服务/DIY</Option>
+                <Option value="30">购物提货券/蛋糕面包</Option>
+                <Option value="31">古董/邮币/字画/收藏</Option>
+                <Option value="32">国货精品数码</Option>
+                <Option value="33">国内机票/国际机票/增值服务</Option>
+                <Option value="34">户外/登山/野营/旅行用品</Option>
+                <Option value="35">基础建材</Option>
+                <Option value="36">家居饰品</Option>
+                <Option value="37">家庭/个人清洁用具</Option>
+                <Option value="0">其他</Option>
+            </Select>
+        </FormItem>
+         <FormItem  label="跟进人员" prop="followPersonel" >
+            <Select v-model="showEditForm.followPersonel" placeholder="无责任人" style="width: 300px" >
+              <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
+                {{personnelId.username}}
+              </Option>
+            </Select>
+        </FormItem>
+        <FormItem  label="处理方案" prop="processingScheme" >
+          <Input v-model="showEditForm.processingScheme"
+                 placeholder="处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
+        </FormItem>
+        <FormItem  label="跟进过程" prop="followProcess" >
+          <Input v-model="showEditForm.followProcess"
+                 placeholder="跟进过程" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
+        </FormItem>
+
+
         <FormItem  label="投诉内容" prop="content" >
           <Input v-model="showEditForm.content"
                  placeholder="请输入投诉内容" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
@@ -184,7 +254,9 @@
     <!--上传文件-->
     <Modal v-model="ts"
            @on-ok="uploadFileEdit"
-           @on-cancel="cancelFileEdit">
+           @on-cancel="cancelFileEdit"
+           draggable
+           scrollable>
       <h3 slot="header" style="color:#2D8CF0">上传文件</h3>
        <!-- <Table border ref="selection"
              :columns="columns3"
@@ -218,7 +290,9 @@
            @on-ok="saveFileTable"
            @on-visible-change="resetData"
            @on-cancel="cancelFileTable"
-           width="800">
+           width="800"
+           draggable
+           scrollable>
       <h3 slot="header" style="color:#2D8CF0">历史记录</h3>
       <Table border ref="selection"
              :columns="columns2"
@@ -233,7 +307,9 @@
               @on-ok="saveTable"
               @on-visible-change="resetData"
               @on-cancel="cancelTable"
-              width="800">
+              width="800"
+              draggable
+           scrollable>
           <h3 slot="header" style="color:#2D8CF0">历史记录</h3>
           <Table border ref="selection"
                 :columns="columns3"
@@ -246,7 +322,9 @@
 
      <Modal v-model="reViewModal"
            @on-ok="saveEdit"
-           @on-cancel="cancelEdit">
+           @on-cancel="cancelEdit"
+           draggable
+           scrollable>
       <h3 slot="header" style="color:#2D8CF0">审核</h3>
       <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
             <FormItem label="状态" prop="status">
@@ -262,7 +340,9 @@
     <Modal v-model="showEditModal"
            @on-ok="saveEdit"
            @on-cancel="cancelEdit"
-           width="800">
+           width="800"
+           draggable
+           scrollable>
       <h3 slot="header" style="color:#2D8CF0">修改信息</h3>
       <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
         <Col span="12">
@@ -334,6 +414,85 @@
           </Select>
         </FormItem>
          </Col> -->
+        <Col span="12">
+            <FormItem  label="店铺近30天成交额" prop="turnover" >
+              <Input v-model="showEditForm.turnover"
+                    placeholder="店铺近30天成交额" style="width: 300px" :clearable="isClearAble"/>
+            </FormItem>
+        </Col>
+        <Col span="12">
+            <FormItem  label="店铺近30天成交笔数" prop="number" >
+              <Input v-model="showEditForm.number"
+                    placeholder="店铺近30天成交笔数" style="width: 300px" :clearable="isClearAble"/>
+            </FormItem>
+        </Col>
+        <Col span="12">
+            <FormItem  label="店铺行业" prop="industry" >
+               <select v-model="showEditForm.industry" style="width: 280px;height:35px"  placeholder="请选择投诉渠道" clearable filterable>
+                    <option value="1">3c数码配件</option>
+                    <option value="2">MP3/MP4/ipod/录音笔</option>
+                    <option value="3">ZIPPO/瑞士军刀/眼镜</option>
+                    <option value="4">办公设备/耗材/相关服务</option>
+                    <option value="5">保健品/膳食营养补充食品</option>
+                    <option value="6">本地优化生活服务</option>
+                    <option value="7">笔记本电脑</option>
+                    <option value="8">彩妆/香水/美妆工具</option>
+                    <option value="9">餐饮具</option>
+                    <option value="10">餐饮美食</option>
+                    <option value="11">茶/咖啡/冲印</option>
+                    <option value="12">超市卡/商场购物卡</option>
+                    <option value="13">成人用品/避孕/计生用品</option>
+                    <option value="14">宠物/宠物食品及用品</option>
+                    <option value="15">厨房/烹饪用具</option>
+                    <option value="16">厨房电器</option>
+                    <option value="17">传统滋补营养品</option>
+                    <option value="18">床上用品</option>
+                    <option value="19">大家电</option>
+                    <option value="20">电脑硬件/显示器/电脑周边</option>
+                    <option value="21">电玩/配件/游戏/攻略</option>
+                    <option value="22">电影/演出/体育赛事</option>
+                    <option value="23">电子/电工</option>
+                    <option value="24">电子词典/电纸书/文化用品</option>
+                    <option value="25">度假旅游/签证送关/旅游服务</option>
+                    <option value="26">服饰配件/皮带/帽子/围巾</option>
+                    <option value="27">服务市场</option>
+                    <option value="28">个人护理/保健/按摩器材</option>
+                    <option value="29">个性定制/设计服务/DIY</option>
+                    <option value="30">购物提货券/蛋糕面包</option>
+                    <option value="31">古董/邮币/字画/收藏</option>
+                    <option value="32">国货精品数码</option>
+                    <option value="33">国内机票/国际机票/增值服务</option>
+                    <option value="34">户外/登山/野营/旅行用品</option>
+                    <option value="35">基础建材</option>
+                    <option value="36">家居饰品</option>
+                    <option value="37">家庭/个人清洁用具</option>
+                    <option value="0">其他</option>
+                </select>
+            </FormItem>
+        </Col>
+        <Col span="12">
+            <FormItem  label="跟进人员" prop="followPersonel" >
+                <Select v-model="showEditForm.followPersonel" placeholder="无责任人" style="width: 300px" >
+                  <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
+                    {{personnelId.username}}
+                  </Option>
+                </Select>
+            </FormItem>
+        </Col>
+        <Col span="12">
+            <FormItem  label="处理方案" prop="processingScheme" >
+              <Input v-model="showEditForm.processingScheme"
+                    placeholder="处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
+            </FormItem>
+        </Col>
+        <Col span="12">
+            <FormItem  label="跟进过程" prop="followProcess" >
+              <Input v-model="showEditForm.followProcess"
+                    placeholder="跟进过程" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
+            </FormItem>
+        </Col>
+
+
          <Col span="12">
          <FormItem label="判责结果" prop="status" >
           <select v-model="showEditForm.status" placeholder="选择状态" filterable  style="width: 280px;height:35px" disabled>
@@ -408,7 +567,7 @@
             <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName"
                     :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
               {{complaintNameId.complaintName}}
-            </Option>
+            </option>
           </Select>
         </FormItem>
 
@@ -448,7 +607,9 @@
     <Modal v-model="showDeleteModal"
            width=15
            @on-ok="saveDelete"
-           @on-cancel="cancelDelete">
+           @on-cancel="cancelDelete"
+           draggable
+           scrollable>
       <!--<h3 slot="header" style="color:red">确定删除吗</h3>-->
       <h2 style="color:red;text-align: center;font-size: 20px" >确定删除吗</h2>
     </Modal>
@@ -456,7 +617,9 @@
     <Modal v-model="deleteModal"
            width=15
            @on-ok="deletefiles"
-           @on-cancel="cancelDeleteFile">
+           @on-cancel="cancelDeleteFile"
+           draggable
+           scrollable>
       <!--<h3 slot="header" style="color:red">确定删除吗</h3>-->
       <h2 style="color:red;text-align: center;font-size: 20px" >确定删除改文件么</h2>
     </Modal>
@@ -554,6 +717,13 @@ import Vue from 'vue';
             url:'',
             name:'',
             complaintId:'',
+
+            turnover:'',
+            number:'',
+            industry:'',
+            followPersonel:'',
+            processingScheme:'',
+            followProcess:'',
          },
           //表单验证(如果为空就会提示)
       addForm:{
@@ -581,6 +751,16 @@ import Vue from 'vue';
               title: '客户名',
               align: 'center',
               key: 'wangwangnum'
+            },
+            {
+              title: '30天成交额',
+              align: 'center',
+              key: 'number'
+            },
+            {
+              title: '30天成交笔数',
+              align: 'center',
+              key: 'industry'
             },
             {
               title: '店铺类型',
@@ -1304,6 +1484,13 @@ import Vue from 'vue';
             this.showEditForm.status = Complaint.status;
             this.showEditForm.complaintdate = Complaint.complaintdate;
             this.showEditForm.tename=Complaint.tename;
+
+            this.showEditForm.turnover = Complaint.turnover;
+            this.showEditForm.number = Complaint.number;
+            this.showEditForm.industry = Complaint.industry;
+            this.showEditForm.followPersonel = Complaint.followPersonel;
+            this.showEditForm.followProcess = Complaint.followProcess;
+            this.showEditForm.processingScheme = Complaint.processingScheme;
           }
         },
         reViewEditModalData(params){

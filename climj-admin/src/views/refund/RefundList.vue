@@ -34,7 +34,7 @@
 
         <!-- 查询 -->
         <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.wangWangNum" style="width:120px" placeholder="请输入客户名" :clearable="isClearAble" />
+        <Input v-model="params.wangwangnum" style="width:120px" placeholder="请输入客户名" :clearable="isClearAble" />
         </Col>
         <Col span="2" style="margin-left: 10px">
         <Input v-model="params.shopptype" style="width:120px" placeholder="请输入店铺类型" :clearable="isClearAble" />
@@ -106,8 +106,8 @@
     <!-- 增加退款弹窗，点击增加按钮弹出 -->
     <Modal v-model="showAddModal" @on-ok="save" @on-cancel="cancel">
         <Form :model="showAddForm" ref="form1" resetFields label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" :rules="addForm">
-            <FormItem label="退款客户" prop="wangWangNum">
-                <Input v-model="showAddForm.wangWangNum" placeholder="请输入退款客户" style="width: 300px" @on-blur="add" :clearable="isClearAble" />
+            <FormItem label="退款客户" prop="wangwangnum">
+                <Input v-model="showAddForm.wangwangnum" placeholder="请输入退款客户" style="width: 300px" @on-blur="add" :clearable="isClearAble" />
             </FormItem>
             <FormItem label="退款日期" prop="hDate">
                 <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showAddForm.hDate" placeholder="退款时间，若不填，获取当前日期时间" style="width: 300px"></DatePicker>
@@ -130,6 +130,9 @@
             <FormItem label="退款原因" prop="refundCause">
                 <Input v-model="showAddForm.refundCause" placeholder="请输入退款原因" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble" />
             </FormItem>
+             <!-- <FormItem label="外因" prop="externalCause">
+                <Input v-model="showAddForm.externalCause" placeholder="请输入退款原因" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble" />
+            </FormItem> -->
             <!-- <FormItem label="场景还原" prop="scenarioReduction">
                 <Upload ref="upload" name="file" action="http://localhost:8090/sys/refund/upload" :on-success="handleSuccess" :on-format-error="handleFormatError">
                     <i-button type="primary" icon="ios-cloud-upload-outline">上传文件</i-button>
@@ -176,8 +179,8 @@
                 </FormItem> -->
             </div>
             <div style="width:270px;float:left">
-                <FormItem label="退款客户" prop="wangWangNum">
-                    <Input disabled v-model="showEditForm.wangWangNum" style="width:150px" />
+                <FormItem label="退款客户" prop="wangwangnum">
+                    <Input disabled v-model="showEditForm.wangwangnum" style="width:150px" />
                 </FormItem>
 
                 <FormItem label="客户类型">
@@ -258,8 +261,8 @@
                 </FormItem> -->
             </div>
             <div style="width:270px;float:left">
-                <FormItem label="退款客户" prop="wangWangNum">
-                    <Input disabled v-model="showEditForm.wangWangNum" style="width:150px" />
+                <FormItem label="退款客户" prop="wangwangnum">
+                    <Input disabled v-model="showEditForm.wangwangnum" style="width:150px" />
                 </FormItem>
 
                 <FormItem label="客户类型">
@@ -303,6 +306,9 @@
                 <FormItem label="退款原因" prop="refundCause">
                     <Input v-model="showEditForm.refundCause" style="width:500px" type="textarea" />
                 </FormItem>
+                <!-- <FormItem label="外因" prop="externalCause">
+                    <Input v-model="showEditForm.externalCause" style="width:500px" type="textarea" />
+                </FormItem> -->
                 <FormItem label="备注" prop="remark">
                     <Input v-model="showEditForm.remark" style="width:500px" type="textarea" />
                 </FormItem>
@@ -351,7 +357,7 @@ export default { //主方法
             params: {
                 pageNum: 1,
                 pageSize: 10,
-                wangWangNum: '',
+                wangwangnum: '',
                 shopptype: '',
                 username1: '',
                 username2: '',
@@ -376,17 +382,18 @@ export default { //主方法
             showModal: false, //不显示 
             fileModal: false,
             showAddForm: {
-                wangWangNum: '',
+                wangwangnum: '',
                 refundDate: '',
                 refundAmount: '',
                 refundChannel: '',
                 refundCause: '',
                 remark: '',
                 hDate:'',
+                // externalCause:'',
             },
             showEditForm: {
                 pkId: '',
-                wangWangNum: '',
+                wangwangnum: '',
                 refundDate: '',
                 refundAmount: '',
                 refundChannel: '',
@@ -404,6 +411,7 @@ export default { //主方法
                 status: '',
                 isDelete: '',
                 deadline: '',
+                // externalCause:'',
             },
 
             showFileForm: {
@@ -414,7 +422,7 @@ export default { //主方法
 
             //表单验证(如果为空就会提示)
             addForm: {
-                wangWangNum: [{
+                wangwangnum: [{
                         required: true,
                         message: '请输入退款客户',
                         trigger: 'blur'
@@ -452,7 +460,7 @@ export default { //主方法
                 {
                     title: '客户名',
                     align: 'center',
-                    key: 'wangWangNum'
+                    key: 'wangwangnum'
                 },
                 {
                     title: '退款日期',
@@ -604,7 +612,7 @@ export default { //主方法
             columns2: [{
                     title: '客户',
                     align: 'center',
-                    key: 'wangWangNum'
+                    key: 'wangwangnum'
                 },
                 {
                     title: '店长',
@@ -830,7 +838,7 @@ export default { //主方法
             if (!val) {
                 this.showEditForm = {
                     pkId: '',
-                    wangWangNum: '',
+                    wangwangnum: '',
                     refundDate: '',
                     refundAmount: '',
                     refundChannel: '',
@@ -993,7 +1001,7 @@ export default { //主方法
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
                 this.showEditForm.pkId = Refund.pkId;
-                this.showEditForm.wangWangNum = Refund.wangWangNum;
+                this.showEditForm.wangwangnum = Refund.wangwangnum;
                 this.showEditForm.refundChannel = Refund.refundChannel;
                 this.showEditForm.scenarioReduction = Refund.scenarioReduction;
                 this.showEditForm.remark = Refund.remark;
@@ -1006,8 +1014,6 @@ export default { //主方法
                 this.showEditForm.custtype = Refund.custtype;
                 this.showEditForm.childtype = Refund.childtype;
                 this.showEditForm.turnovermoney = Refund.turnovermoney;
-                console.log("详情:退款金额为1111111111111111111:"+Refund.turnovermoney);
-                console.log("详情:退款金额为2222222222222222222:"+this.showEditForm.turnovermoney);
                 this.showEditForm.teamname = Refund.teamname;
                 this.showEditForm.serverdeadline = Refund.serverdeadline;
                 this.showEditForm.serverdeadlineend = Refund.serverdeadlineend;
@@ -1015,6 +1021,7 @@ export default { //主方法
                 this.showEditForm.username1 = Refund.username1;
                 this.showEditForm.username2 = Refund.username2;
                 this.showEditForm.shopptype = Refund.shopptype;
+                // this.showEditForm.externalCause = Refund.externalCause;
             }
         },
 
@@ -1027,7 +1034,7 @@ export default { //主方法
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
                 this.showEditForm.pkId = Refund.pkId;
-                this.showEditForm.wangWangNum = Refund.wangWangNum;
+                this.showEditForm.wangwangnum = Refund.wangwangnum;
                 this.showEditForm.refundChannel = Refund.refundChannel;
                 this.showEditForm.scenarioReduction = Refund.scenarioReduction;
                 this.showEditForm.remark = Refund.remark;
@@ -1047,6 +1054,7 @@ export default { //主方法
                 this.showEditForm.username1 = Refund.username1;
                 this.showEditForm.username2 = Refund.username2;
                 this.showEditForm.shopptype = Refund.shopptype;
+                // this.showEditForm.externalCause = Refund.externalCause;
                 // console.log("修改:退款金额为1111111111111111111:"+Refund.turnovermoney);
                 // console.log("修改:退款金额为2222222222222222222:"+this.showEditForm.turnovermoney);
             }
@@ -1166,11 +1174,11 @@ export default { //主方法
             this.loading = false;
         },
 
-        //通过wangWangNum查询
+        //通过wangwangnum查询
         lookModal(params) {
             this.showModal = true;
-            this.params.wangWangNum = params.row.wangWangNum;
-            // console.log(this.params.wangWangNum+"sefh iowrw jkojrjjjjjjjjj");
+            this.params.wangwangnum = params.row.wangwangnum;
+            // console.log(this.params.wangwangnum+"sefh iowrw jkojrjjjjjjjjj");
             this.params.pageNum = 1;
             // 数据初始化
             this.loading = true;
@@ -1181,7 +1189,7 @@ export default { //主方法
                 if (data && data.code == 0) {
                     this.data2 = data.data;
                     // console.log("data2"+this.data2);
-                    this.params.wangWangNum = '';
+                    this.params.wangwangnum = '';
                 } else {
                     this.$Message.error(data.msg);
                 }
