@@ -20,10 +20,10 @@
 
         <!-- 日期查询 -->
         <Col span="3">
-        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 00:00:00" v-model="params.startTime" @on-change="search" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
+        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" @on-change="search" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
         </Col>
         <Col span="3">
-        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 23:59:59" v-model="params.endTime" @on-change="search" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
+        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" @on-change="search" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
         </Col>
 
         <!-- <Col>
