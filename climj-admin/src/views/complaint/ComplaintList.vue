@@ -49,17 +49,17 @@
       </Select>
       </Col>
         <Col span="4">
-            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" placeholder="开始时间" style="width: 200px"></DatePicker>
-            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" placeholder="结束时间" style="width: 200px"></DatePicker>
+            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" @on-change="searchComplaint" placeholder="开始时间" style="width: 200px"></DatePicker>
+            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" @on-change="searchComplaint" placeholder="结束时间" style="width: 200px"></DatePicker>
         </Col>
       <Col span="4">
-        <Input v-model="params.frequency" placeholder="搜索投诉数量" :clearable="isClearAble"  @click="searchComplaint"/>
+        <Input v-model="params.frequency" placeholder="搜索投诉数量" :clearable="isClearAble"  @on-change="searchComplaint"/>
       </Col>
       <Col span="4">
-        <Input v-model="params.TeamName" placeholder="搜索团队名" :clearable="isClearAble"  @click="searchComplaint"/>
+        <Input v-model="params.TeamName" placeholder="搜索团队名" :clearable="isClearAble"  @on-change="searchComplaint"/>
       </Col>
       <Col span="4">
-        <i-select v-model="params.channel" style="width: 300px"  placeholder="请选择投诉渠道"  :clearable="isClearAble"  @click="searchComplaint">
+        <i-select v-model="params.channel" style="width: 300px"  placeholder="请选择投诉渠道" @on-change="searchComplaint" clearable filterable>
                 <Option value="1">招商京东</Option>
                 <Option value="2">招商淘宝</Option>
                 <Option value="3">综管部</Option>
@@ -70,10 +70,10 @@
                 <Option value="8">其他</Option>
             </i-select>
       </Col>
-      <Col span="4">
+      <Col span="4" push=1>
         <Input v-model="params.keyword" placeholder="搜索客户名，投诉时间"  :clearable="isClearAble"/>
       </Col>
-      <Col span="1" style="margin-left: 5px">
+      <Col span="1" push=2>
         <span ><Button type="primary" @click="searchComplaint" icon="search">搜索</Button></span>
       </Col>
     </Row>
@@ -105,40 +105,52 @@
            @on-cancel="cancel"
            @on-visible-change="resetData"
            draggable
-           scrollable>
+           scrollable
+           width="850">
       <h3 slot="header" style="color:#2D8CF0">增加信息</h3>
       <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" :rules="addForm">
         <!-- <FormItem  label="ID" prop="pkId" >
            <Input v-model="showAddForm.pkId" :disabled="isDisabled"></Input>
          </FormItem>-->
-
-        <FormItem  label="投诉客户" prop="wangwangnum" >
-          <Input @on-blur="yanzheng" v-model="showEditForm.wangwangnum"
-                 placeholder="请输入投诉客户" style="width: 300px" :clearable="isClearAble"/>
-        </FormItem>
-        <FormItem  label="投诉渠道" prop="channel">
-          <Select v-model="showEditForm.channel" style="width: 300px"  placeholder="请选择投诉渠道">
-                <Option value="1">招商京东</Option>
-                <Option value="2">招商淘宝</Option>
-                <Option value="3">综管部</Option>
-                <Option value="4">企划部</Option>
-                <Option value="5">京东官方投诉</Option>
-                <Option value="6">京东差评投诉</Option>
-                <Option value="7">淘宝官方投诉</Option>
-                <Option value="8">其他</Option>
-            </Select>
-        </FormItem>
-        
+      <Row>
+        <Col span="12"> 
+          <FormItem  label="投诉客户" prop="wangwangnum" >
+              <Input @on-blur="yanzheng" v-model="showEditForm.wangwangnum" placeholder="请输入投诉客户" style="width: 300px"/>
+          </FormItem>
+        </Col>
+        <Col span="12">
+          <FormItem  label="投诉渠道" prop="channel">
+            <Select v-model="showEditForm.channel" style="width: 300px"  placeholder="请选择投诉渠道">
+                  <Option value="1">招商京东</Option>
+                  <Option value="2">招商淘宝</Option>
+                  <Option value="3">综管部</Option>
+                  <Option value="4">企划部</Option>
+                  <Option value="5">京东官方投诉</Option>
+                  <Option value="6">京东差评投诉</Option>
+                  <Option value="7">淘宝官方投诉</Option>
+                  <Option value="8">其他</Option>
+              </Select>
+          </FormItem>
+        </Col>
+      </Row>
+      <Row>
+        <Col span="12">
          <FormItem  label="店铺近30天成交额" prop="turnover" >
           <Input v-model="showEditForm.turnover"
-                 placeholder="店铺近30天成交额" style="width: 300px" :clearable="isClearAble"/>
+                 placeholder="店铺近30天成交额" style="width: 300px"/>
         </FormItem>
-       <FormItem  label="店铺近30天成交笔数" prop="number" >
-          <Input v-model="showEditForm.number"
-                 placeholder="店铺近30天成交笔数" style="width: 300px" :clearable="isClearAble"/>
-        </FormItem>
+        </Col>
+        <Col span="12">
+          <FormItem  label="店铺近30天成交笔数" prop="number" >
+              <Input v-model="showEditForm.number"
+                    placeholder="店铺近30天成交笔数" style="width: 300px"/>
+            </FormItem>
+        </Col>
+      </Row>
+      <Row>
+        <Col span="12">
          <FormItem  label="店铺行业" prop="industry" >
-          <Select v-model="showEditForm.industry" style="width: 300px"  placeholder="请选择投诉渠道" clearable filterable>
+          <Select v-model="showEditForm.industry" style="width: 300px"  placeholder="请选择投诉渠道" filterable>
                 <Option value="1">3c数码配件</Option>
                 <Option value="2">MP3/MP4/ipod/录音笔</Option>
                 <Option value="3">ZIPPO/瑞士军刀/眼镜</Option>
@@ -179,6 +191,8 @@
                 <Option value="0">其他</Option>
             </Select>
         </FormItem>
+        </Col>
+        <Col span="12">
          <FormItem  label="跟进人员" prop="followPersonel" >
             <Select v-model="showEditForm.followPersonel" placeholder="无责任人" style="width: 300px" >
               <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
@@ -186,20 +200,37 @@
               </Option>
             </Select>
         </FormItem>
-        <FormItem  label="处理方案" prop="processingScheme" >
-          <Input v-model="showEditForm.processingScheme"
-                 placeholder="处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
-        </FormItem>
+        </Col>
+      </Row>
+      <Row>
+        <Col span="12">
+          <FormItem  label="处理方案" prop="processingScheme" >
+            <Input v-model="showEditForm.processingScheme"
+                  placeholder="处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px"/>
+          </FormItem>
+        </Col>
+        <Col span="12">
         <FormItem  label="跟进过程" prop="followProcess" >
           <Input v-model="showEditForm.followProcess"
-                 placeholder="跟进过程" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
+                 placeholder="跟进过程" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px"/>
         </FormItem>
-
-
+        </Col>
+      </Row>
+      <Row>
+        <Col span="12">
         <FormItem  label="投诉内容" prop="content" >
           <Input v-model="showEditForm.content"
-                 placeholder="请输入投诉内容" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
+                 placeholder="请输入投诉内容" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px"/>
         </FormItem>
+        </Col>
+        <Col span="12">
+        <FormItem  label="备注" prop="remarks" >
+          <Input v-model="showEditForm.remarks"
+                 placeholder="备注" style="width: 300px"  type="textarea" :autosize="{minRows: 5,maxRows: 5}"/>
+        </FormItem>
+        </Col>
+      </Row>
+      <Row>
         <FormItem label="投诉日期" prop="complaintdate">
           <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.complaintdate" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
         </FormItem>
@@ -245,10 +276,7 @@
               </Upload>
           </template> 
        </FormItem> -->
-        <FormItem  label="备注" prop="remarks" >
-          <Input v-model="showEditForm.remarks"
-                 placeholder="备注" style="width: 300px"  type="textarea" :autosize="{minRows: 5,maxRows: 5}" :clearable="isClearAble"/>
-        </FormItem>
+      </Row>
       </Form>
     </Modal>
     <!--上传文件-->
@@ -345,66 +373,75 @@
            scrollable>
       <h3 slot="header" style="color:#2D8CF0">修改信息</h3>
       <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
+      <Row>
         <Col span="12">
-        <FormItem  label="投诉客户" prop="wangwangnum" >
-          <Input v-model="showEditForm.wangwangnum"/>
-        </FormItem>
+          <FormItem  label="投诉客户" prop="wangwangnum" >
+            <Input v-model="showEditForm.wangwangnum"/>
+          </FormItem>
         </Col>
         <Col span="12">
-        <FormItem  label="投诉次数(第几次)" prop="frequency">
-          <Input v-model="showEditForm.frequency" disabled/>
-        </FormItem>
+          <FormItem  label="投诉次数(第几次)" prop="frequency">
+            <Input v-model="showEditForm.frequency" disabled/>
+          </FormItem>
         </Col>
-         <Col span="12">
+      </Row>
+      <Row>
+        <Col span="12">
           <FormItem label="投诉日期" prop="complaintdate">
-          <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.complaintdate" placeholder="Select date and time(Excluding seconds)" style="width: 280px"></DatePicker>
-        </FormItem>
+            <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.complaintdate" placeholder="Select date and time(Excluding seconds)" style="width: 280px"></DatePicker>
+          </FormItem>
          </Col>
          <Col span="12">
-         <FormItem label="店长" prop="username">
-          <Input v-model="showEditForm.username" disabled/>
-          <!-- <Select v-model="showEditForm.tscustomer" placeholder="无店长">
-            <Option v-for="tscustomerId in personnelIds" :label="tscustomerId.username" :value="tscustomerId.id" :key="tscustomerId.id">
-              {{tscustomerId.username}}
-            </Option>
-          </Select> -->
-        </FormItem>
+          <FormItem label="店长" prop="username">
+            <Input v-model="showEditForm.username" disabled/>
+            <!-- <Select v-model="showEditForm.tscustomer" placeholder="无店长">
+              <Option v-for="tscustomerId in personnelIds" :label="tscustomerId.username" :value="tscustomerId.id" :key="tscustomerId.id">
+                {{tscustomerId.username}}
+              </Option>
+            </Select> -->
+          </FormItem>
+         </Col>
+      </Row>
+      <Row>
+         <Col span="12">
+          <FormItem label="投诉渠道" prop="channel">
+            <select v-model="showEditForm.channel" style="width: 280px;height:35px" disabled>
+                  <option value="1">招商京东</option>
+                  <option value="2">招商淘宝</option>
+                  <option value="3">综管部</option>
+                  <option value="4">企划部</option>
+                  <option value="5">京东官方投诉</option>
+                  <option value="6">京东差评投诉</option>
+                  <option value="7">淘宝官方投诉</option>
+                  <option value="8">其他</Option>
+              </select>
+          </FormItem>
          </Col>
          <Col span="12">
-         <FormItem label="投诉渠道" prop="channel">
-          <select v-model="showEditForm.channel" style="width: 280px;height:35px" disabled>
-                <option value="1">招商京东</option>
-                <option value="2">招商淘宝</option>
-                <option value="3">综管部</option>
-                <option value="4">企划部</option>
-                <option value="5">京东官方投诉</option>
-                <option value="6">京东差评投诉</option>
-                <option value="7">淘宝官方投诉</option>
-                <option value="8">其他</Option>
-            </select>
-        </FormItem>
-         </Col>
-         <Col span="12">
-         <FormItem label="所属团队" prop="teamname">
-          <Input v-model="showEditForm.teamname" disabled/>
+          <FormItem label="所属团队" prop="teamname">
+            <Input v-model="showEditForm.teamname" disabled/>
 
-          <!-- <Select v-model="showEditForm.tscustomer" placeholder="无团队">
-            <Option v-for="teamNameId in teamNameIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
-              {{teamNameId.teamname}}
-            </Option>
-          </Select> -->
-        </FormItem>
+            <!-- <Select v-model="showEditForm.tscustomer" placeholder="无团队">
+              <Option v-for="teamNameId in teamNameIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+                {{teamNameId.teamname}}
+              </Option>
+            </Select> -->
+          </FormItem>
          </Col>
+      </Row>
+      <Row>
          <Col span="12">
-          <FormItem  label="客户类型" prop="shopptype" >
-          <Input v-model="showEditForm.shopptype" disabled/>
-        </FormItem>
+            <FormItem  label="客户类型" prop="shopptype" >
+              <Input v-model="showEditForm.shopptype" disabled/>
+            </FormItem>
          </Col>
          <Col span="12">
           <FormItem  label="车手:" prop="tename">
-          <Input v-model="showEditForm.tename" disabled placeholder="暂无对应车手"/>
-        </FormItem>
+            <Input v-model="showEditForm.tename" disabled placeholder="暂无对应车手"/>
+          </FormItem>
          </Col>
+      </Row>
+      <Row>
          <!-- <Col span="12">
          <FormItem label="车手" prop="username">
           <Select v-model="showEditForm.technologyRecruitmentid" placeholder="无车手">
@@ -415,17 +452,19 @@
         </FormItem>
          </Col> -->
         <Col span="12">
-            <FormItem  label="店铺近30天成交额" prop="turnover" >
+            <FormItem  label="近30天成交额" prop="turnover" >
               <Input v-model="showEditForm.turnover"
                     placeholder="店铺近30天成交额" style="width: 300px" :clearable="isClearAble"/>
             </FormItem>
         </Col>
         <Col span="12">
-            <FormItem  label="店铺近30天成交笔数" prop="number" >
+            <FormItem  label="近30天成交笔数" prop="number" >
               <Input v-model="showEditForm.number"
                     placeholder="店铺近30天成交笔数" style="width: 300px" :clearable="isClearAble"/>
             </FormItem>
         </Col>
+      </Row>
+      <Row>
         <Col span="12">
             <FormItem  label="店铺行业" prop="industry" >
                <select v-model="showEditForm.industry" style="width: 280px;height:35px"  placeholder="请选择投诉渠道" clearable filterable>
@@ -479,6 +518,8 @@
                 </Select>
             </FormItem>
         </Col>
+      </Row>
+      <Row>
         <Col span="12">
             <FormItem  label="处理方案" prop="processingScheme" >
               <Input v-model="showEditForm.processingScheme"
@@ -491,28 +532,32 @@
                     placeholder="跟进过程" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble"/>
             </FormItem>
         </Col>
-
-
+      </Row>
+      <Row>
          <Col span="12">
          <FormItem label="判责结果" prop="status" >
-          <select v-model="showEditForm.status" placeholder="选择状态" filterable  style="width: 280px;height:35px" disabled>
-            <option value="0">待审核</option>
-            <option value="1">已审核</option>
-            <option value="2">待审定</option>
-          </select>
-        </FormItem>
+            <select v-model="showEditForm.status" placeholder="选择状态" filterable  style="width: 280px;height:35px" disabled>
+              <option value="0">待审核</option>
+              <option value="1">已审核</option>
+              <option value="2">待审定</option>
+            </select>
+          </FormItem>
          </Col>
          <Col span="12">
           <FormItem label="招商顾问" prop="username">
-          <Select v-model="showEditForm.personnelid" placeholder="无招商顾问">
-            <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
-              {{personnelId.username}}
-            </Option>
-          </Select>
-        </FormItem>
+            <Select v-model="showEditForm.personnelid" placeholder="无招商顾问">
+              <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
+                {{personnelId.username}}
+              </Option>
+            </Select>
+          </FormItem>
          </Col>
+      </Row>
+      <Row>
          <Col span="12">
          </Col>
+      </Row>
+      <Row>
         <FormItem label="投诉原因" prop="content">
            <Input v-model="showEditForm.content"
                  placeholder="请输入投诉内容" type="textarea" :autosize="{minRows: 5,maxRows: 5}" :clearable="isClearAble"/>
@@ -520,6 +565,7 @@
         <FormItem  label="备注" prop="remarks" >
           <Input v-model="showEditForm.remarks"   placeholder="请输入投诉备注" type="textarea" :autosize="{minRows: 5,maxRows: 5}" :clearable="isClearAble"/>
         </FormItem>
+      </Row>
         <!-- <FormItem label="场景还原地址" prop="scenerestoration">
           <ul style="list-style:none">
             <li v-for="(item,index) in url" class="forteItem" :key="index"> -->
@@ -615,7 +661,6 @@
     </Modal>
     <!-- 删除文件 -->
     <Modal v-model="deleteModal"
-           width=15
            @on-ok="deletefiles"
            @on-cancel="cancelDeleteFile"
            draggable
@@ -891,7 +936,7 @@ import Vue from 'vue';
                 }, '删除');
                 let showBtn = h('Button', {
                   props: {
-                    type: 'success',
+                    type: 'info',
                     size: 'small'
 
                   },
@@ -908,7 +953,7 @@ import Vue from 'vue';
                 let lookBtn = h(
                   'Button', {
                   props: {
-                    type: 'success',
+                    type: 'warning',
                     size: 'small'
 
                   },

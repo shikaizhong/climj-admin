@@ -10,7 +10,7 @@
 
         <!-- 状态选择 -->
         <Col span="2" style="margin-left: 10px">
-        <i-select @on-change="init" v-model="params.status" placeholder="选择状态" filterable style="width:120px">
+        <i-select @on-change="search" v-model="params.status" placeholder="选择状态" filterable style="width:120px" clearable>
             <Option value="0">待审核</Option>
             <Option value="1">已审核</Option>
             <Option value="2">待审定</Option>
@@ -19,11 +19,11 @@
         </Col>
 
         <!-- 日期查询 -->
-        <Col span="4" style="margin-left: 20px">
-        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 00:00:00" v-model="params.startTime" @on-change="params.startTime=$event" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
+        <Col span="3">
+        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 00:00:00" v-model="params.startTime" @on-change="search" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
         </Col>
-        <Col span="4" style="margin-left: 10px">
-        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 23:59:59" @on-change="params.endTime=$event" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
+        <Col span="3">
+        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd 23:59:59" v-model="params.endTime" @on-change="search" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
         </Col>
 
         <!-- <Col>
@@ -33,28 +33,28 @@
             </Col>   -->
 
         <!-- 查询 -->
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.wangwangnum" style="width:120px" placeholder="请输入客户名" :clearable="isClearAble" />
+        <Col span="3">
+        <Input v-model="params.wangwangnum" style="width:200px" @on-change="search" placeholder="请输入客户名" clearable />
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.shopptype" style="width:120px" placeholder="请输入店铺类型" :clearable="isClearAble" />
+        <Col span="3">
+        <Input v-model="params.shopptype" style="width:200px" @on-change="search" placeholder="请输入店铺类型" clearable />
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.username1" style="width:120px" placeholder="请输入店长" :clearable="isClearAble" />
+        <Col span="3">
+        <Input v-model="params.username1" style="width:200px" @on-change="search" placeholder="请输入店长" clearable />
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.username2" style="width:120px" placeholder="请输入招商顾问" :clearable="isClearAble" />
+        <Col span="3">
+        <Input v-model="params.username2" style="width:200px" @on-change="search" placeholder="请输入招商顾问" clearable/>
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.teamname" style="width:120px" placeholder="请输入团队" :clearable="isClearAble" />
+        <Col span="3">
+        <Input v-model="params.teamname" style="width:200px" @on-change="search" placeholder="请输入团队" clearable/>
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.frequency" style="width:120px" placeholder="请输入隐患次数" :clearable="isClearAble" />
+        <Col span="3">
+        <Input v-model="params.frequency" style="width:200px" @on-change="search" placeholder="请输入隐患次数" clearable />
         </Col>
 
         <!-- 搜索按钮 -->
         <Col span="1" style="margin-left: 5px">
-        <span><Button type="primary" @click="init" icon="search">搜索</Button></span>
+            <span><Button type="primary" @click="init" icon="search">搜索</Button></span>
         </Col>
     </Row>
 
@@ -197,7 +197,7 @@
     <Modal v-model="uploadFile" @on-ok="fileAdd" @on-cancel="cancelEdit">
         <h3 slot="header" style="color:#2D8CF0">文件上传</h3>
         <template>
-            <Upload ref="upload" name="file" :show-upload-list="false" :on-success="handleSuccess" :multiple="true" action="http://localhost:8090/sys/hidden/uploads" style="display: inline-block;width:58px;">
+            <Upload ref="upload" name="file" :show-upload-list="false" :on-success="handleSuccess" :multiple="true" action="http://192.168.1.112:9090/mj-admin/sys/hidden/uploads" style="display: inline-block;width:58px;">
                 <div style="width: 58px;height:58px;line-height: 58px;">
                     <Icon type="ios-camera" size="30"></Icon>
                 </div>
@@ -235,7 +235,7 @@ export default {
                 username1: '',
                 username2: '',
                 teamname: '',
-                frequency: 0,
+                frequency: '',
                 startTime: '',
                 endTime: '',
                 status: -1
@@ -280,7 +280,7 @@ export default {
             showFileForm: {
                 url: '',
                 name: '',
-                relevanceId: '',
+                complaintId: '',
             },
             pageNumber: [], //表格页数
             length: [], //表格每页长度
@@ -404,7 +404,7 @@ export default {
                         }, '删除');
                         let showBtn = h('Button', {
                             props: {
-                                type: 'success',
+                                type: 'info',
                                 size: 'small'
                             },
                             style: {
@@ -418,7 +418,7 @@ export default {
                         }, '历史记录');
                         let uploadBtn = h('Button', {
                             props: {
-                                type: 'info',
+                                type: 'warning',
                                 size: 'small'
                             },
                             style: {
@@ -432,7 +432,7 @@ export default {
                         }, '上传附件');
                         let fileBtn = h('Button', {
                             props: {
-                                type: 'primary',
+                                type: 'success',
                                 size: 'small'
                             },
                             style: {
@@ -619,7 +619,7 @@ export default {
                     pkId: '',
                     name: '',
                     url: '',
-                    relevanceId: '',
+                    complaintId: '',
                 };
             }
         },
@@ -627,7 +627,22 @@ export default {
         cancelEdit() {
             this.uploadFile = false;
         },
-
+        search() {
+            API.hiddenTroubleList.lists(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.data1 = data.data.list;
+                    this.totalCount = data.data.total;
+                    this.length = data.data.list.length;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
+            this.loading = false;
+        },
 
         init() {
             // 数据初始化
@@ -781,7 +796,7 @@ export default {
         //修改
         showEditModalData(params) {
             this.modifierModal = true;
-            this.showFileForm.relevanceId = params.row.pkId;
+            this.showFileForm.complaintId = params.row.pkId;
             if (typeof params.row != 'undefined') {
                 const HiddenTrouble = params.row;
                 this.modifierForm.pkId = HiddenTrouble.pkId;
@@ -849,9 +864,8 @@ export default {
         //批量上传文件
         uploadAdd(params, showFileForm) {
             this.uploadFile = true;
-            // this.params.id = params.row.pkId;
-            let relevanceId = params.row.pkId;
-            this.showFileForm.relevanceId = relevanceId;
+            let complaintId = params.row.pkId;
+            this.showFileForm.complaintId = complaintId;
             this.loading = false;
         },
 
@@ -866,7 +880,7 @@ export default {
                 this.name = scenerestoration.name;
                 let name = this.name;
                 let url = this.url;
-                this.showFileForm.url = this.url;
+                this.showFileForm.url = url;
                 this.showFileForm.name = name;
             } else {
                 alert("上传失败");
@@ -889,7 +903,7 @@ export default {
         //文件列表
         showFileFormList(params) {
             this.fileModal = true;
-            this.showFileForm.relevanceId = params.row.pkId;
+            this.showFileForm.complaintId = params.row.pkId;
             API.hiddenTroubleList.selectFile(this.showFileForm).then(({
                 data
             }) => {
@@ -915,7 +929,7 @@ export default {
         saveFileDelete() {
             // this.showDeleteFileModal = true;
             let pkId = this.showFileForm.pkId;
-            let relevanceId = this.showFileForm.relevanceId;
+            let complaintId = this.showFileForm.complaintId;
             API.hiddenTroubleList.deleteFile(this.showFileForm).then(({
                 data
             }) => {

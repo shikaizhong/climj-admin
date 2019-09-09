@@ -10,7 +10,7 @@
 
         <!-- 状态选择 -->
         <Col span="2" style="margin-left: 10px">
-        <i-select @on-change="init" v-model="params.status" placeholder="选择状态" filterable style="width:120px">
+        <i-select @on-change="inits" v-model="params.status" placeholder="选择状态" filterable style="width:120px" :clearable="isClearAble">
             <Option value="0">待审核</Option>
             <Option value="1">已审核</Option>
             <Option value="2">待审定</Option>
@@ -19,11 +19,11 @@
         </Col>
 
         <!-- 日期查询 -->
-        <Col span="2" style="margin-left: 20px">
-        <date-picker type="date" style="width:100px" format="yyyy-MM-dd HH:mm:ss" @on-change="params.startTime=$event" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
+        <Col span="3">
+        <DatePicker type="date" style="width:210px" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" @on-change="init" placeholder="请选择开始时间"></DatePicker>
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <date-picker type="date" style="width:100px" format="yyyy-MM-dd HH:mm:ss" @on-change="params.endTime=$event" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
+        <Col span="3">
+        <DatePicker type="date" style="width:210px" format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" @on-change="init" placeholder="请选择结束时间"></DatePicker>
         </Col>
 
         <!-- <Col>
@@ -34,24 +34,24 @@
 
         <!-- 查询 -->
         <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.wangwangnum" style="width:120px" placeholder="请输入客户名" :clearable="isClearAble" />
+        <Input v-model="params.wangwangnum" style="width:120px" @on-change="inits" placeholder="请输入客户名"  clearable filterable/>
         </Col>
         <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.shopptype" style="width:120px" placeholder="请输入店铺类型" :clearable="isClearAble" />
+        <Input v-model="params.shopptype" style="width:120px" @on-change="inits" placeholder="请输入店铺类型"  :clearable="isClearAble" />
         </Col>
         <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.username1" style="width:120px" placeholder="请输入店长" :clearable="isClearAble" />
+        <Input v-model="params.username1" style="width:120px" @on-change="inits" placeholder="请输入店长"  clearable filterable />
         </Col>
         <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.username2" style="width:120px" placeholder="请输入招商顾问" :clearable="isClearAble" />
+        <Input v-model="params.username2" style="width:120px" @on-change="inits" placeholder="请输入招商顾问"  clearable filterable />
         </Col>
         <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.teamname" style="width:120px" placeholder="请输入团队" :clearable="isClearAble" />
+        <Input v-model="params.teamname" style="width:120px" @on-change="inits" placeholder="请输入团队"  clearable filterable />
         </Col>
 
         <!-- 搜索按钮 -->
         <Col span="1" style="margin-left: 5px">
-        <span><Button type="primary" @click="init" icon="search">搜索</Button></span>
+        <span><Button type="primary" @click="inits" icon="search">搜索</Button></span>
         </Col>
 
     </Row>
@@ -560,7 +560,7 @@ export default { //主方法
                         }, '删除');
                         let showBtn = h('Button', {
                             props: {
-                                type: 'success',
+                                type: 'info',
                                 size: 'small'
                             },
                             style: {
@@ -574,7 +574,7 @@ export default { //主方法
                         }, '历史记录');
                         let uploadBtn = h('Button', {
                             props: {
-                                type: 'info',
+                                type: 'warning',
                                 size: 'small'
                             },
                             style: {
@@ -588,7 +588,7 @@ export default { //主方法
                         }, '上传附件');
                         let fileBtn = h('Button', {
                             props: {
-                                type: 'primary',
+                                type: 'success',
                                 size: 'small'
                             },
                             style: {
@@ -779,7 +779,28 @@ export default { //主方法
         reset1(){
             this.$refs.form2.resetFields();
         },
-
+         inits() {
+            // 数据初始化
+            this.loading = true;
+            API.refundList.lists(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.data1 = data.data.list;
+                    // console.log("第一个data1为:"+this.data1);
+                    this.totalCount = data.data.total;
+                    this.length = data.data.list.length;
+                    // for(var i = 0;i<this.length;i++){
+                    //     this.pkIds.push(data.data.list[i].pkIds);
+                    // }
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
+            this.loading = false;
+        },
         init() {
             // 数据初始化
             this.loading = true;
@@ -1041,6 +1062,7 @@ export default { //主方法
                 this.showEditForm.refundAmount = Refund.refundAmount;
                 this.showEditForm.status = Refund.status;
                 this.showEditForm.isDelete = Refund.isDelete;
+                this.showEditForm.refundDate = Refund.refundDate;
                 this.showEditForm.hDate = Refund.refundDate; 
                 this.showEditForm.refundCause = Refund.refundCause;
                 this.showEditForm.level = Refund.level;

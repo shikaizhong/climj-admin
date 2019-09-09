@@ -32,28 +32,28 @@
         </Row>
         <Row style="margin-top: 15px" type="flex" justify="start" class="code-row-bg">
             <Col span="2">
-                <Select placeholder="请选择判责类型:" filterable v-model="params.type">
+                <Select placeholder="请选择判责类型:" filterable v-model="params.type" @on-change="searchComplaint">
                         <Option value="0">投诉</Option>
                         <Option value="1">隐患</Option>
                         <Option value="2">退款</Option>
                     </Select>
             </Col>
             <Col span="2" push=1>
-                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="params.startTime=$event" placeholder="开始时间" style="width: 200px"></DatePicker>
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" placeholder="开始时间" @on-change="searchComplaint" style="width: 200px"></DatePicker>
             </Col>
-            <Col span="2" push=1>
-                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" @on-change="params.endTime=$event" placeholder="结束时间" style="width: 200px"></DatePicker>
-            </Col>
-            <Col span="4" push=2>
-                <Input placeholder="客诉大类别" v-model="params.parentName" @click="searchComplaint"  size="large" clearable/>
+            <Col span="2" push=2>
+                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" placeholder="结束时间" @on-change="searchComplaint" style="width: 200px"></DatePicker>
             </Col>
             <Col span="4" push=3>
-                <Input placeholder="搜索客诉级别" v-model="params.grade"  @click="searchComplaint" size="large" clearable/>
+                <Input placeholder="客诉大类别" v-model="params.parentName" @on-change="searchComplaint"  size="large" clearable/>
             </Col>
             <Col span="4" push=4>
-                 <Input placeholder="搜索店铺名"  size="large" style="width: auto" />
+                <Input placeholder="搜索客诉级别" v-model="params.grade"  @on-change="searchComplaint" size="large" clearable/>
             </Col>
-            <Col span="4" push=3>
+            <Col span="4" push=5>
+                 <Input placeholder="搜索店铺名" v-model="params.keyword"  size="large" style="width: auto" clearable/>
+            </Col>
+            <Col span="4" push=4>
                  <span ><Button type="primary"  @click="searchComplaint" icon="search">搜索</Button></span>
             </Col>
         </Row>
@@ -82,123 +82,138 @@
            scrollable>
            <h3 slot="header" style="color:#2D8CF0">修改信息</h3>
            <Form :model="showEditForm"  label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
-            <Col span="12">
-                <FormItem  label="客户:" prop="wangwangnum" >
-                   <input style="width: 300px"  v-model="showEditForm.wangwangnum" disabled/>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem label="客诉大类别" prop="parentName" >
-                    <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 300px">
-                        <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
-                        {{levelId.parentName}}
-                        </Option>
-                    </Select>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                 <FormItem label="客诉小类别" prop="complaintName" >
-                    <Select v-model="showEditForm.sonLevel" placeholder="Select your pkId" style="width: 300px">
-                        <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName"
-                                :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
-                        {{complaintNameId.complaintName}}
-                        </Option>
-                    </Select>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem  label="客诉点总结:" prop="summary" >
-                    <Input placeholder="请输入客诉点总结" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px"  v-model="showEditForm.summary"/>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem  label="判定依据说明" prop="basic" >
-                    <Input placeholder="请输入判定依据说明" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px"  v-model="showEditForm.basic"/>
-                </FormItem>
-            </Col>
-            <Col span="12">  
-                <FormItem  label="判责结果:" prop="result" >
-                     <select placeholder="判责结果:" style="width: 300px;height:35px" v-model="showEditForm.result">
-                        <option value="0">微责</option>
-                        <option value="1">无责</option>
-                        <option value="2">待定</option>
-                        <option value="3">轻责</option>
-                        <option value="4">中责</option>
-                        <option value="5">重责</option>
-                    </select>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem label="责任人" prop="responsibilityer">
-                    <Select v-model="showEditForm.responsibilityer" placeholder="无责任人" style="width: 300px" >
-                        <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
-                        {{personnelId.username}}
-                        </Option>
-                    </Select>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem  label="客诉级别:" prop="grade" >
-                     <select placeholder="客诉级别:" style="width: 300px;height:35px" v-model="showEditForm.grade">
-                        <option value="0">一级</option>
-                        <option value="1">二级</option>
-                        <option value="2">三级</option>
-                    </select>
-                </FormItem>
-            </Col>
-            <!-- <Col span="12">
-                <FormItem  label="是否退款:" prop="isRefund"  v-model="showEditForm.isRefund">
-                    <RadioGroup>
-                        <Radio :label="0" >否</Radio>
-                        <Radio :label="1" >是</Radio>
-                    </RadioGroup>
-                </FormItem>
-            </Col> -->
-            <Col span="12">
-                <FormItem  label="签约人:" prop="pname">
-                   <input  style="width: 300px" v-model="showEditForm.pname" placeholder="暂无数据" disabled/>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem  label="签约人组别:" prop="pteamname" >
-                   <input  style="width: 300px" v-model="showEditForm.pteamname" placeholder="暂无数据" disabled/>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem  label="店长:" prop="tename" >
-                   <input  style="width: 300px" v-model="showEditForm.tename"/>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem  label="店长组别:" prop="teamname" >
-                   <input  style="width: 300px" v-model="showEditForm.teamname" disabled/>
-                </FormItem>
-            </Col>
-           
-            <Col span="12">
-                <FormItem  label="处理方案:" prop="deal" >
-                    <Input placeholder="请输入处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}"  style="width: 300px" v-model="showEditForm.deal" disabled/>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem  label="判责人员:" prop="responsibilityor" >
-                   <select placeholder="判责人员:" style="width: 300px;height:35px" v-model="showEditForm.responsibilityor">
-                        <option value="187">蔓越莓</option>
-                        <option value="277">四叶草</option>
-                    </select>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem label="签单日期" prop="serverdeadline">
-                    <DatePicker type="datetime" format="yyyy-MM-dd " v-model="showEditForm.serverdeadline" disabled placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
-                </FormItem>
-            </Col>
-            <Col span="12">
-                <FormItem label="判责日期" prop="hDate">
-                    <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.hDate" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
-                    <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" @on-change="modifierForm.hiddenDate=$event" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker> -->
-                </FormItem>
-            </Col>
+              <Row>  
+                <Col span="12">
+                    <FormItem  label="客户:" prop="wangwangnum" >
+                    <input style="width: 300px"  v-model="showEditForm.wangwangnum" disabled/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="客诉大类别" prop="parentName" >
+                        <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 300px">
+                            <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
+                            {{levelId.parentName}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                    <FormItem label="客诉小类别" prop="complaintName" >
+                        <Select v-model="showEditForm.sonLevel" placeholder="Select your pkId" style="width: 300px">
+                            <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName"
+                                    :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+                            {{complaintNameId.complaintName}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem  label="客诉点总结:" prop="summary" >
+                        <Input placeholder="请输入客诉点总结" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px"  v-model="showEditForm.summary"/>
+                    </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                    <FormItem  label="判定依据说明" prop="basic" >
+                        <Input placeholder="请输入判定依据说明" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px"  v-model="showEditForm.basic"/>
+                    </FormItem>
+                </Col>
+                <Col span="12">  
+                    <FormItem  label="判责结果:" prop="result" >
+                        <select placeholder="判责结果:" style="width: 300px;height:35px" v-model="showEditForm.result">
+                            <option value="0">微责</option>
+                            <option value="1">无责</option>
+                            <option value="2">待定</option>
+                            <option value="3">轻责</option>
+                            <option value="4">中责</option>
+                            <option value="5">重责</option>
+                        </select>
+                    </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                    <FormItem label="责任人" prop="responsibilityer">
+                        <Select v-model="showEditForm.responsibilityer" placeholder="无责任人" style="width: 300px" >
+                            <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
+                            {{personnelId.username}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem  label="客诉级别:" prop="grade" >
+                        <select placeholder="客诉级别:" style="width: 300px;height:35px" v-model="showEditForm.grade">
+                            <option value="0">一级</option>
+                            <option value="1">二级</option>
+                            <option value="2">三级</option>
+                        </select>
+                    </FormItem>
+                </Col>
+              </Row>
+                <!-- <Col span="12">
+                    <FormItem  label="是否退款:" prop="isRefund"  v-model="showEditForm.isRefund">
+                        <RadioGroup>
+                            <Radio :label="0" >否</Radio>
+                            <Radio :label="1" >是</Radio>
+                        </RadioGroup>
+                    </FormItem>
+                </Col> -->
+              <Row>
+                <Col span="12">
+                    <FormItem  label="签约人:" prop="pname">
+                    <input  style="width: 300px" v-model="showEditForm.pname" placeholder="暂无数据" disabled/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem  label="签约人组别:" prop="pteamname" >
+                    <input  style="width: 300px" v-model="showEditForm.pteamname" placeholder="暂无数据" disabled/>
+                    </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                    <FormItem  label="店长:" prop="tename" >
+                    <input  style="width: 300px" v-model="showEditForm.tename" disabled/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem  label="店长组别:" prop="teamname" >
+                    <input  style="width: 300px" v-model="showEditForm.teamname" disabled/>
+                    </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                    <FormItem  label="处理方案:" prop="deal" >
+                        <Input placeholder="请输入处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}"  style="width: 300px" v-model="showEditForm.deal" disabled/>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem  label="判责人员:" prop="responsibilityor" >
+                    <select placeholder="判责人员:" style="width: 300px;height:35px" v-model="showEditForm.responsibilityor">
+                            <option value="187">蔓越莓</option>
+                            <option value="277">四叶草</option>
+                        </select>
+                    </FormItem>
+                </Col>
+              </Row>
+              <Row>
+                <Col span="12">
+                    <FormItem label="签单日期" prop="serverdeadline">
+                        <DatePicker type="datetime" format="yyyy-MM-dd " v-model="showEditForm.serverdeadline" disabled placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="判责日期" prop="hDate">
+                        <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" v-model="showEditForm.hDate" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
+                        <!-- <DatePicker type="datetime" format="yyyy-MM-dd HH:mm" @on-change="modifierForm.hiddenDate=$event" placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker> -->
+                    </FormItem>
+                </Col>
+              </Row>
            </Form>
         </Modal>
         <!--判责-->
@@ -662,7 +677,7 @@ export default {
                                     let lookFileBtn = h(
                                         'Button', {
                                         props: {
-                                            type: 'success',
+                                            type: 'info',
                                             size: 'small'
 
                                         },
