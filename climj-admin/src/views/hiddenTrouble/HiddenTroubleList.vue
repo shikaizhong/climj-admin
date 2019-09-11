@@ -3,27 +3,26 @@
     <!-- 筛选，判断 -->
     <Row style="margin-top: 15px" type="flex">
         <!-- 增加按钮 -->
-        <Col span="1" style="margin-left: 5px">
+        <Col span="2" push=1>
         <span><Button type="primary" @click="addModal" icon="search">增加</Button></span>
         <!-- <span ><Button  type="error"  @click="this.delete" icon="trash-a">批量删除</Button></span> -->
         </Col>
 
         <!-- 状态选择 -->
-        <Col span="2" style="margin-left: 10px">
-        <i-select @on-change="search" v-model="params.status" placeholder="选择状态" filterable style="width:120px" clearable>
-            <Option value="0">待审核</Option>
-            <Option value="1">已审核</Option>
-            <Option value="2">待审定</Option>
-            <Option value="-1">全部</Option>
+        <Col span="4" push=1>
+        <i-select @on-change="init" v-model="params.result" placeholder="选择状态" filterable :clearable="isClearAble" style="width:210px">
+            <Option value="0">微责</Option>
+            <Option value="1">无责</Option>
+            <Option value="2">重责</Option>
+            <Option value="3">中责</Option>
+            <Option value="4">轻责</Option>
+            <Option value="5">待定</Option>
         </i-select>
         </Col>
 
         <!-- 日期查询 -->
-        <Col span="3">
-        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" @on-change="search" placeholder="请选择开始时间" :clearable="isClearAble"></date-picker>
-        </Col>
-        <Col span="3">
-        <date-picker type="date" style="width:200px"  format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" @on-change="search" placeholder="请选择结束时间" :clearable="isClearAble"></date-picker>
+        <Col span="4" push=1>
+        <Date-picker type="datetimerange" v-model="params.dateTime" format="yyyy-MM-dd HH:mm" @on-change="search" placeholder="选择日期和时间" style="width: 300px"></Date-picker>
         </Col>
 
         <!-- <Col>
@@ -33,30 +32,31 @@
             </Col>   -->
 
         <!-- 查询 -->
-        <Col span="3">
+        <Col span="4" push=2>
         <Input v-model="params.wangwangnum" style="width:200px" @on-change="search" placeholder="请输入客户名" clearable />
         </Col>
-        <Col span="3">
+        <Col span="4" push=2>
         <Input v-model="params.shopptype" style="width:200px" @on-change="search" placeholder="请输入店铺类型" clearable />
         </Col>
-        <Col span="3">
+    </Row>
+    <Row style="margin-top:5px">
+        <Col span="4" push=3>
         <Input v-model="params.username1" style="width:200px" @on-change="search" placeholder="请输入店长" clearable />
         </Col>
-        <Col span="3">
+        <Col span="4" push=3>
         <Input v-model="params.username2" style="width:200px" @on-change="search" placeholder="请输入招商顾问" clearable/>
         </Col>
-        <Col span="3">
+        <Col span="4" push=4>
         <Input v-model="params.teamname" style="width:200px" @on-change="search" placeholder="请输入团队" clearable/>
         </Col>
-        <Col span="3">
+        <Col span="4" push=4>
         <Input v-model="params.frequency" style="width:200px" @on-change="search" placeholder="请输入隐患次数" clearable />
         </Col>
-
         <!-- 搜索按钮 -->
-        <Col span="1" style="margin-left: 5px">
+        <Col span="4" style="margin-left: 5px" push=3>
             <span><Button type="primary" @click="init" icon="search">搜索</Button></span>
         </Col>
-    </Row>
+   </Row>
 
     <!-- 主页面的表格 -->
     <Row style="margin-top: 25px">
@@ -154,48 +154,72 @@
         <h3 slot="header" style="color:#2D8CF0">详情</h3>
         <Form :model="modifierForm" label-position="right" :label-width="100" @submit.native.prevent="saveModifier" inline>
             <div style="width:270px;float:left">
-                <FormItem label="客户名" prop="wangwangnum">
+                <FormItem label="客户名" prop="wangwangnum" v-if="modifierForm.wangwangnum != null">
                     <Input disabled v-model="modifierForm.wangwangnum" style="width:150px" />
                 </FormItem>
-                <FormItem label="客户类型">
+                <FormItem label="客户类型" v-if="modifierForm.custtype != null">
                     <div>
                         <Input disabled v-model="modifierForm.custtype" style="width:75px" />
                         <Input disabled v-model="modifierForm.childtype" style="width:75px" />
                     </div>
                 </FormItem>
-                <FormItem label="隐患日期" prop="hiddenDate">
-                    <DatePicker type="datetime" readonly disabled format="yyyy-MM-dd HH:mm" v-model="modifierForm.hiddenDate" style="width:180px"></DatePicker>
+                <FormItem label="隐患日期" prop="createTime" v-if="modifierForm.createTime != null">
+                    <DatePicker type="datetime" readonly disabled format="yyyy-MM-dd HH:mm" v-model="modifierForm.createTime" style="width:180px"></DatePicker>
                 </FormItem>
-                <FormItem label="招商顾问" prop="username2">
-                    <Input disabled v-model="modifierForm.username2" style="width:120px" />
+                <FormItem label="招商顾问" prop="pname" v-if="modifierForm.pname != null">
+                    <Input disabled v-model="modifierForm.pname" style="width:120px" />
                 </FormItem>
             </div>
             <div style="width:240px;float:left">
-                <FormItem label="隐患次数" prop="frequency">
+                <FormItem label="隐患次数" prop="frequency" v-if="modifierForm.frequency != null">
                     <Input disabled v-model="modifierForm.frequency" style="width:120px" />
                 </FormItem>
-                <FormItem label="店长" prop="username1">
-                    <Input disabled v-model="modifierForm.username1" style="width:120px" />
+                <FormItem label="店长" prop="tename" v-if="modifierForm.tename != null">
+                    <Input disabled v-model="modifierForm.tename" style="width:120px" />
                 </FormItem>
-                <FormItem label="所属团队" prop="teamname">
+                <FormItem label="所属团队" prop="teamname" v-if="modifierForm.teamname != null">
                     <Input disabled v-model="modifierForm.teamname" style="width:120px" />
                 </FormItem>
-                <FormItem label="店铺类型" prop="shopptype">
+                <FormItem label="店铺类型" prop="shopptype" v-if="modifierForm.shopptype != null">
                     <Input disabled v-model="modifierForm.shopptype" style="width:120px" />
                 </FormItem>
             </div>
-            <FormItem label="隐患内容" prop="hiddenContent">
+            <FormItem label="隐患内容" prop="hiddenContent" v-if="modifierForm.hiddenContent != null">
                 <Input disabled v-model="modifierForm.hiddenContent" type="textarea" style="width:400px" />
             </FormItem>
-            <FormItem label="备注" prop="remark">
+            <FormItem label="备注" prop="remark" v-if="modifierForm.remark != null">
                 <Input disabled v-model="modifierForm.remark" type="textarea" style="width:400px" />
             </FormItem>
+            <Row>
+             <Col span="12">
+                    <FormItem label="客诉大类别" prop="parentName" v-if="modifierForm.level != null">
+                        <Select @on-change="selectLevel" v-model="modifierForm.level" placeholder="Select your level" style="width: 200px">
+                            <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
+                            {{levelId.parentName}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="客诉小类别" prop="complaintName" v-if="modifierForm.level != null">
+                        <Select v-model="modifierForm.sonLevel" placeholder="Select your pkId" style="width: 200px">
+                            <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName"
+                                    :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+                            {{complaintNameId.complaintName}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+            </Row>
+             <FormItem label="外因" prop="externalCause" v-if="modifierForm.externalCause != null">
+                    <Input v-model="modifierForm.externalCause" style="width:500px" type="textarea" />
+                </FormItem>
         </Form>
     </Modal>
 
-    <!-- 文件上传 -->
-    <Modal v-model="uploadFile" @on-ok="fileAdd" @on-cancel="cancelEdit">
-        <h3 slot="header" style="color:#2D8CF0">文件上传</h3>
+    <!-- 文件列表 -->
+    <Modal v-model="fileModal" @on-ok="fileTable" @on-visible-change="resetDate1" @on-cancel="cancelFileList" width=30%>
+        <h3 slot="header" style="color:#2D8CF0">文件列表</h3>
         <template>
             <Upload ref="upload" name="file" :show-upload-list="false" :on-success="handleSuccess" :multiple="true" action="http://192.168.1.112:9090/mj-admin/sys/hidden/uploads" style="display: inline-block;width:58px;">
                 <div style="width: 58px;height:58px;line-height: 58px;">
@@ -203,11 +227,6 @@
                 </div>
             </Upload>
         </template>
-    </Modal>
-
-    <!-- 文件列表 -->
-    <Modal v-model="fileModal" @on-ok="fileTable" @on-visible-change="resetDate1" @on-cancel="cancelFileList" width=50%>
-        <h3 slot="header" style="color:#2D8CF0">历史记录</h3>
         <Table border ref="selection" :columns="columns3" :data="data3" width=100%>
         </Table>
     </Modal>
@@ -236,9 +255,10 @@ export default {
                 username2: '',
                 teamname: '',
                 frequency: '',
-                startTime: '',
-                endTime: '',
-                status: -1
+                dateTime:'',
+                // startTime: '',
+                // endTime: '',
+                result: -1
             },
             params1: {
                 level: -1,
@@ -268,14 +288,19 @@ export default {
                 custtype: '',
                 childtype: '',
                 shopptype: '',
-                username1: '',
-                username2: '',
-                // technologyrecruitmentid:'',
+                pname: '',
+                tename: '',
                 teamname: '',
-                status: '',
+                result: '',
                 isDelete: '',
-                level: '',
-                hiddenDate:''
+                hiddenDate:'',
+                createTime:'',
+                level:'',
+                sonLevel:'',
+                parentId:'',
+                externalCause:'',
+                tename:'',
+                pname:'',
             },
             showFileForm: {
                 url: '',
@@ -284,6 +309,10 @@ export default {
             },
             pageNumber: [], //表格页数
             length: [], //表格每页长度
+             //客诉大类别
+            levels:[],
+            //客诉小类别
+            levelNames:[],
 
             //表单验证(如果为空就会提示)
             addForm: {
@@ -334,11 +363,11 @@ export default {
                 },
                 {
                     title: '状态',
-                    key: 'status',
+                    key: 'result',
                     render: (h, params) => {
-                        const row = params.row;
-                        const color = row.status == 0 ? 'green' : (row.status == 1 ? 'red' : 'blue');
-                        const text = row.status == 0 ? '待审核' : (row.status == 1 ? "已审核" : "待审定");
+                        const result = params.row.result;
+                        const color = result == 0 ? '#68838B' : (result == 1 ? '#20B2AA' : (result == 2 ? '#FF0000' : (result == 3 ? '#8B008B' : (result == 4 ? '#BC8F8F' : '#63B8FF'))));
+                        const text = result == 0 ? '微责' : (result == 1 ? '无责' : (result == 2 ? '重责' : (result == 3 ? '中责' : (result == 4 ? '轻责' : '待定'))));
                         return h('Tag', {
                             props: {
                                 color: color
@@ -416,20 +445,6 @@ export default {
                                 }
                             }
                         }, '历史记录');
-                        let uploadBtn = h('Button', {
-                            props: {
-                                type: 'warning',
-                                size: 'small'
-                            },
-                            style: {
-                                marginRight: '3px'
-                            },
-                            on: {
-                                click: () => {
-                                    this.uploadAdd(params);
-                                }
-                            }
-                        }, '上传附件');
                         let fileBtn = h('Button', {
                             props: {
                                 type: 'success',
@@ -445,47 +460,35 @@ export default {
                             }
                         }, '附件');
                         return h(
-                            'div', [editBtn, deleteBtn, showBtn, uploadBtn, fileBtn]
+                            'div', [editBtn, deleteBtn, showBtn, fileBtn]
                         );
                     }
                 }
             ],
             //详情表格
-            columns2: [{
-                    title: '客户名',
-                    align: 'center',
-                    key: 'wangwangnum'
-                },
+            columns2: [
                 {
-                    title: '隐患日期',
-                    align: 'center',
-                    key: 'hiddenDate'
-                },
-                {
-                    title: '隐患次数（第几次）',
+                    title: '类型',
                     align: 'center',
                     render: (h, params) => {
-                        return h('div', [
-                            h('span', {
-                                style: {
-                                    display: 'block'
-                                }
-                            }, "该用户的第"+params.row.frequency + "次隐患"),
-                        ]);
+                    const row = params.row;
+                    const color=row.type==0 ? 'green' :(row.type ==1 ? 'red':(row.type ==2 ?'blue':'purple'));
+                    const text=row.type==0 ? '投诉' :(row.type ==1 ? "隐患":(row.type ==2? '退款':'其他'));
+                    return h('Tag', {
+                    props: {
+                        color: color
+                    }
+                    }, text);
                     },
-                },
-                {
-                    title: '店长',
-                    align: 'center',
-                    key: 'username1'
+                    align: 'center'
                 },
                 {
                     title: '状态',
-                    key: 'status',
+                    key: 'result',
                     render: (h, params) => {
-                        const row = params.row;
-                        const color = row.status == 0 ? 'green' : (row.status == 1 ? 'red' : 'blue');
-                        const text = row.status == 0 ? '待审核' : (row.status == 1 ? "已审核" : "待审定");
+                        const result = params.row.result;
+                        const color = result == 0 ? '#68838B' : (result == 1 ? '#20B2AA' : (result == 2 ? '#FF0000' : (result == 3 ? '#8B008B' : (result == 4 ? '#BC8F8F' : '#63B8FF'))));
+                        const text = result == 0 ? '微责' : (result == 1 ? '无责' : (result == 2 ? '重责' : (result == 3 ? '中责' : (result == 4 ? '轻责' : '待定'))));
                         return h('Tag', {
                             props: {
                                 color: color
@@ -495,26 +498,27 @@ export default {
                     align: 'center'
                 },
                 {
-                    title: '隐患原因',
+                    title: '日期',
                     align: 'center',
-                    ellipsis: true,
-                    key: 'hiddenContent',
+                    key: 'createTime'
+                },
+                {
+                    title: '客户',
+                    align: 'center',
+                    key: 'wangwangnum'
+                },
+                {
+                    title: '次数(第几次)',
+                    align: 'center',
                     render: (h, params) => {
                         return h('div', [
-                            h(
-                                'span', {
-                                    style: {
-
-                                    },
-                                    //就是这里加的属性
-                                    domProps: {
-                                        title: params.row.hiddenContent,
-                                    }
-                                },
-                                params.row.hiddenContent,
-                            )
-                        ])
-                    }
+                            h('span', {
+                                style: {
+                                    display: 'block'
+                                }
+                            }, "该用户的第"+params.row.frequency + "次"),
+                        ]);
+                    },
                 },
                 {
                     title: '操作',
@@ -593,6 +597,12 @@ export default {
                     }
                 }
             ],
+            complaintIds:{
+                pkId: '',
+                parentId: '',
+                complaintName:'',
+                parentName:'',
+            },
             data1: [],
             data2: [],
             data3: [],
@@ -731,7 +741,7 @@ export default {
             this.params.pageNum = 1;
             // 数据初始化
             this.loading = true;
-            API.hiddenTroubleList.selectByWangWangNum(this.params).then(({
+            API.complaintList.listByWangWangNum(this.params).then(({
                 data
             }) => {
                 if (data && data.code == 0) {
@@ -805,25 +815,39 @@ export default {
                 this.modifierForm.username2 = HiddenTrouble.username2;
                 this.modifierForm.shopptype = HiddenTrouble.shopptype;
                 this.modifierForm.hiddenDate = HiddenTrouble.hiddenDate;
-                // console.log("获取的时间为："+HiddenTrouble.hiddenDate);
-                // console.log("获取的时间1为："+HiddenTrouble.hDate);
+                console.log("修改时间为1:"+ HiddenTrouble.hiddenDate);
                 this.modifierForm.hDate = HiddenTrouble.hiddenDate;
-                // console.log("获取的时间2为："+this.modifierForm.hDate);
+                console.log("修改时间为2:"+this.modifierForm.hDate);
                 this.modifierForm.wangwangnum = HiddenTrouble.wangwangnum;
-                // console.log("旺旺名为："+ HiddenTrouble.wangwangnum);
                 this.modifierForm.hiddenContent = HiddenTrouble.hiddenContent;
                 this.modifierForm.remark = HiddenTrouble.remark;
                 this.modifierForm.frequency = HiddenTrouble.frequency;
                 this.modifierForm.custtype = HiddenTrouble.custtype;
                 this.modifierForm.childtype = HiddenTrouble.childtype;
-                this.modifierForm.status = HiddenTrouble.status;
+                this.modifierForm.result = HiddenTrouble.result;
                 this.modifierForm.isDelete = HiddenTrouble.isDelete;
                 this.modifierForm.level = HiddenTrouble.level;
+                this.modifierForm.sonLevel = HiddenTrouble.sonLevel;
+                this.modifierForm.parentId = HiddenTrouble.parentId;
+                this.modifierForm.externalCause = HiddenTrouble.externalCause;
             }
         },
 
         //详情，调用接口
         details() {
+             //大类
+            API.complaintList.selectLevel(this.params).then(({data}) => {
+                console.log("进来喽哦");
+                if (data && data.code == 0) {
+                this.levels = data.data;
+                console.log("大类");
+                console.log(this.levels);
+                } else {
+                this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
             API.hiddenTroubleList.update(this.modifierForm).then(({
                 data
             }) => {
@@ -844,9 +868,10 @@ export default {
                 const HiddenTrouble = params.row;
                 this.modifierForm.pkId = HiddenTrouble.pkId;
                 this.modifierForm.teamname = HiddenTrouble.teamname;
-                this.modifierForm.username1 = HiddenTrouble.username1;
-                this.modifierForm.username2 = HiddenTrouble.username2;
+                this.modifierForm.tename = HiddenTrouble.tename;
+                this.modifierForm.pname = HiddenTrouble.pname;
                 this.modifierForm.hDate = HiddenTrouble.hDate;
+                this.modifierForm.createTime =HiddenTrouble.createTime;
                 this.modifierForm.shopptype = HiddenTrouble.shopptype;
                 this.modifierForm.hiddenDate = HiddenTrouble.hiddenDate;
                 this.modifierForm.wangwangnum = HiddenTrouble.wangwangnum;
@@ -855,9 +880,10 @@ export default {
                 this.modifierForm.frequency = HiddenTrouble.frequency;
                 this.modifierForm.custtype = HiddenTrouble.custtype;
                 this.modifierForm.childtype = HiddenTrouble.childtype;
-                this.modifierForm.status = HiddenTrouble.status;
+                this.modifierForm.result = HiddenTrouble.result;
                 this.modifierForm.isDelete = HiddenTrouble.isDelete;
-                this.modifierForm.level = HiddenTrouble.level;
+                this.modifierForm.pname =  HiddenTrouble.username2;
+                this.modifierForm.tename = HiddenTrouble.username1;
             }
         },
 
@@ -870,18 +896,37 @@ export default {
         },
 
         //上传成功之后的方法
+        //上传
+        //上传成功之后的方法
         handleSuccess(res, file) {
             let _this = this;
             if (res.code == 0) {
                 alert("上传中");
-                // this.complaintId = data.data;
                 let scenerestoration = file.response.data;
                 this.url = scenerestoration.url;
                 this.name = scenerestoration.name;
-                let name = this.name;
-                let url = this.url;
-                this.showFileForm.url = url;
-                this.showFileForm.name = name;
+                this.showFileForm.url = this.url;
+                this.showFileForm.name = this.name;
+                API.hiddenTroubleList.addFile(this.showFileForm).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.init();
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                });
+                API.hiddenTroubleList.selectFile(this.showFileForm).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.data3 = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                });
             } else {
                 alert("上传失败");
             }
@@ -983,6 +1028,34 @@ export default {
         cancelFileList() {
             this.fileModal = false;
         },
+         //点击客诉大类别
+            selectLevel(params){
+            this.params1.parentId=this.modifierForm.level;
+            this.modifierForm.parentId = this.params1.parentId;
+            this.modifierForm.pkId = this.modifierForm.sonLevel;
+            //小类
+            API.complaintList.getLevelName(this.params1).then(({data}) => {
+                if (data && data.code == 0) {
+                this.levelNames = data.data.list;
+                } else {
+                this.$Message.error(data.msg);
+                }
+                }).catch((data) => {
+                    this.$Message.error('当前没有判责');
+                    });
+            },
+        //点击详情确定可以修改客诉信息
+        saveEdits(){
+            API.responsibilityList.update(this.modifierForm).then(({data}) => {
+                    if (data && data.code == 0) {
+                    this.init();
+                    } else {
+                    this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                })
+        }
     }
 }
 </script>

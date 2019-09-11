@@ -22,10 +22,10 @@
                 <Select placeholder="判责结果:" style="width: 300px;height:35px" v-model="params.result"  @on-change="searchComplaint" clearable filterablea>
                         <Option value="0">微责</Option>
                         <Option value="1">无责</Option>
-                        <Option value="2">待定</Option>
+                        <Option value="2">重责</Option>
                         <Option value="3">轻责</Option>
                         <Option value="4">中责</Option>
-                        <Option value="5">重责</Option>
+                        <Option value="5">待定</Option>
                         <Option value="-1">全部</Option>
                     </Select>
             </Col>
@@ -38,12 +38,12 @@
                         <Option value="2">退款</Option>
                     </Select>
             </Col>
-            <Col span="2" push=1>
-                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" placeholder="开始时间" @on-change="searchComplaint" style="width: 200px"></DatePicker>
+            
+            <!-- 日期查询 -->
+            <Col span="3" push=1>
+            <Date-picker type="datetimerange" v-model="params.dateTime" format="yyyy-MM-dd HH:mm" @on-change="searchComplaint" placeholder="选择日期和时间" style="width: 300px"></Date-picker>
             </Col>
-            <Col span="2" push=2>
-                <DatePicker type="datetime" format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" placeholder="结束时间" @on-change="searchComplaint" style="width: 200px"></DatePicker>
-            </Col>
+
             <Col span="4" push=3>
                 <Input placeholder="客诉大类别" v-model="params.parentName" @on-change="searchComplaint"  size="large" clearable/>
             </Col>
@@ -126,10 +126,10 @@
                         <select placeholder="判责结果:" style="width: 300px;height:35px" v-model="showEditForm.result">
                             <option value="0">微责</option>
                             <option value="1">无责</option>
-                            <option value="2">待定</option>
+                            <option value="2">重责</option>
                             <option value="3">轻责</option>
                             <option value="4">中责</option>
-                            <option value="5">重责</option>
+                            <option value="5">待定</option>
                         </select>
                     </FormItem>
                 </Col>
@@ -228,16 +228,16 @@
                         <RadioGroup  placeholder="判责结果:" v-model="showEditForm.result">
                             <Radio  :label="0">微责</Radio >
                             <Radio  :label="1">无责</Radio >
-                            <Radio  :label="2">待定</Radio >
+                            <Radio  :label="2">重责</Radio >
                             <Radio  :label="3">轻责</Radio>
                             <Radio  :label="4">中责</Radio >
-                            <Radio  :label="5">重责</Radio >
+                            <Radio  :label="5">待定</Radio >
                         </RadioGroup>
                     </FormItem> 
             </Form>
         </Modal>
         <!--上传判责依据-->
-        <Modal v-model="ts"
+        <!-- <Modal v-model="ts"
            @on-ok="uploadFileEdit"
            draggable
            scrollable
@@ -250,18 +250,30 @@
                   :on-success="handleSuccess"
                   :on-format-error="handleFormatError"
                   :multiple="true"
-                  action="http://192.168.1.112:9090/mj-admin/sys/complaint/uploads" 
+                  action="http://192.168.1.112:9090/mj-admin/sys/complaint/uploads"
                   style="display: inline-block;width:58px;">
                   <div style="width: 58px;height:58px;line-height: 58px;">
                       <Icon type="ios-camera" size="30"></Icon>
                   </div>
               </Upload>
           </template> 
-        </Modal>
+        </Modal> -->
         <!--根据判责id查看判责依据-->
         <Modal v-model="showFileModal"
                 width="800">
             <h3 slot="header" style="color:#2D8CF0">查看判责依据文件</h3>
+            <Upload
+                  ref="upload"
+                  :show-upload-list="false"
+                  :on-success="handleSuccess"
+                  :on-format-error="handleFormatError"
+                  :multiple="true"
+                  action="http://192.168.1.112:9090/mj-admin/sys/complaint/uploads"
+                  style="display: inline-block;width:58px;">
+                  <div style="width: 58px;height:58px;line-height: 58px;">
+                      <Icon type="ios-camera" size="30"></Icon>
+                  </div>
+              </Upload>
             <Table border ref="selection"
                     :columns="columns3"
                     :current="params.pageNum"
@@ -334,15 +346,6 @@
                     </FormItem>
                 </Col>
                 <Col span="12">
-                    <FormItem label="判责结果" prop="status" >
-                        <select v-model="complaintIds.status" placeholder="选择状态" filterable  style="width: 280px;height:35px" disabled>
-                            <option value="0">待审核</option>
-                            <option value="1">已审核</option>
-                            <option value="2">待审定</option>
-                        </select>
-                    </FormItem>
-                </Col>
-                <Col span="12">
                     <FormItem label="招商顾问" prop="username">
                         <Select v-model="complaintIds.personnelid" placeholder="无招商顾问" disabled>
                             <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
@@ -358,7 +361,7 @@
                 </Col>
                 <Col span="12">
                     <FormItem  label="备注" prop="remarks" >
-                        <Input v-model="complaintIds.remarks"   placeholder="请输入投诉备注" type="textarea" :autosize="{minRows: 5,maxRows: 5}" disabled/>
+                        <Input v-model="complaintIds.remarks"   placeholder="请输入投诉备注" type="textarea" disabled/>
                     </FormItem>
                 </Col>
             </form>
@@ -487,14 +490,15 @@ export default {
         return{
             params:{
                 pageNum: 1,
-                pageSize: 10,
-                keyword: '',
-                type: 0,
+                pageSize: 3,
+                keyword:'',
+                wangwangnum: '',
                 PersonnelID:-1,
                 TScustomer:null,
                 TeamName:null,
-                startTime:'',
-                endTime:'',
+                dateTime:'',
+                // startTime:'',
+                // endTime:'',
                 result:-1,
                 parentName:null,
                 grade:null,
@@ -570,7 +574,7 @@ export default {
                     render: (h, params) => {
                     const row = params.row;
                     const color=row.result==0 ? 'green' :(row.result ==1 ? 'red':(row.result ==2 ? 'blue':(row.result == 3 ? 'purple ':(row.result == 4 ? 'pink':'orange'))));
-                    const text=row.result==0 ? '微责' :(row.result ==1 ? "无责":(row.result == 2 ? '待定':(row.result == 3 ? '轻责': (row.result == 4 ? '中责':'重责'))));
+                    const text=row.result==0 ? '微责' :(row.result ==1 ? "无责":(row.result == 2 ? '重责':(row.result == 3 ? '轻责': (row.result == 4 ? '中责':'待定'))));
                     return h('Tag', {
                     props: {
                         color: color
@@ -595,12 +599,12 @@ export default {
                         align: 'center'
                 },
                 {
-                    title: '投诉渠道',
+                    title: '类型',
                     key: 'channel',
                     render: (h, params) => {
                         const row = params.row;
-                        const color=row.channel==1 ? 'green' :(row.channel ==2 ? 'red':(row.channel ==3 ? 'blue':(row.channel ==4 ? 'purple':(row.channel == 5 ? 'pink':(row.channel == 6 ? 'orange':(row.channel == 7 ? 'bronze':'rainbow'))))));
-                        const text=row.channel==1 ? '招商京东' :(row.channel ==2 ? '招商淘宝':(row.channel ==3 ? '综管部 ':(row.channel ==4 ? '企划部':(row.channel == 5 ? '京东官方投诉':(row.channel == 6 ? '京东差评投诉 ':(row.channel == 7 ? '淘宝官方投诉':'其他'))))));
+                        const color=row.type==0 ? 'green' :(row.type ==1 ? 'red':(row.type ==2 ? 'blue':(row.type ==3 ? 'purple':'rainbow')));
+                        const text=row.type==0 ? '投诉' :(row.type ==1 ? '隐患':(row.type ==2 ? '退款 ':(row.type ==3 ? '流失':'其他')));
                         return h('Tag', {
                         props: {
                             color: color
@@ -692,7 +696,7 @@ export default {
 
                                         }, '查看依据')
                             return h(
-                            'div', [editBtn,detailsBtn,reViewBtn,lookBtn,lookFileBtn]
+                            'div', [editBtn,detailsBtn,reViewBtn,lookFileBtn]
                             );
                     }
                 },
@@ -966,9 +970,9 @@ export default {
            showEditModalData(params){
             this.showEditModal = true;
             this.params.complaintId = params.row.pkId;
+            this.showEditForm.type = params.row.type;
             let complaintId = this.params.complaintId;
             this.showEditForm.complaintId = complaintId;
-            console.log(this.showEditForm.complaintId+"添加的id为");
             //大类
             API.complaintList.selectLevel(this.params).then(({data}) => {
                 if (data && data.code == 0) {
@@ -1189,11 +1193,12 @@ export default {
             //点击查看详情
             details(params){
                 this.detailsModal = true;
-                let paramss = this.params.type;
+                let paramss = params.row.type;
                 console.log(paramss+"type为");  
                 //0是投诉
                 if(paramss == 0){
                     this.params.pkId = params.row.pkId;
+                    this.params.type =  params.row.type;
                     console.log(params.row.pkId+"id为")
                     API.responsibilityList.selectById(this.params).then(({data}) => {
                         if (data && data.code == 0) {
@@ -1209,6 +1214,7 @@ export default {
                 //1是隐患
                 }else if(paramss ==1){
                     this.params.pkId = params.row.pkId;
+                    this.params.type =  params.row.type;
                     console.log(params.row.pkId+"id为")
                     API.responsibilityList.selectById(this.params).then(({data}) => {
                         if (data && data.code == 0) {
@@ -1225,6 +1231,7 @@ export default {
                 //2是退款
                 }else{
                     this.params.pkId = params.row.pkId;
+                    this.params.type =  params.row.type;
                     console.log(params.row.pkId+"id为")
                     API.responsibilityList.selectById(this.params).then(({data}) => {
                         if (data && data.code == 0) {
@@ -1272,6 +1279,30 @@ export default {
                     this.name = scenerestoration.name;
                     let name = this.name;
                     let url =this.url;
+                    this.showEditForm.name = name;
+                    this.showEditForm.url = url;
+                    API.responsibilityList.addFile(this.showEditForm).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.init();
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                });
+                API.complaintList.selectFiles(this.showEditForm).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                      console.log("刷新列表了");
+                        this.data3 = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                });
+
                 } else {
                     alert("上传失败");
                 }

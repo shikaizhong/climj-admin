@@ -118,3 +118,11 @@ export function listFile(params) {
     data: requestParam(params, "post", true, "json")
   });
 }
+//修改客诉类别
+export function updataLevel(params){
+  return request({
+    method:'post',
+    url:requestURL('/sys/responsibility/updataLevel'),
+    data:requestParam(params,'post',true,'json')
+  })
+}

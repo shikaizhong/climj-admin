@@ -3,57 +3,46 @@
     <!-- 筛选，判断 -->
     <Row style="margin-top: 15px" type="flex">
         <!-- 增加按钮 -->
-        <Col span="1" style="margin-left: 5px">
+        <Col span="4" push=1>
         <span><Button type="primary" @click="addModal" icon="search">增加</Button></span>
+        <!-- 状态选择 -->
+        <i-select @on-change="inits" v-model="params.result" placeholder="选择状态" filterable :clearable="isClearAble" style="width:210px">
+            <Option value="0">微责</Option>
+            <Option value="1">无责</Option>
+            <Option value="2">重责</Option>
+            <Option value="3">中责</Option>
+            <Option value="4">轻责</Option>
+            <Option value="5">待定</Option>
+        </i-select>
         <!-- <span ><Button  type="error"  @click="this.delete" icon="trash-a">批量删除</Button></span> -->
         </Col>
-
-        <!-- 状态选择 -->
-        <Col span="2" style="margin-left: 10px">
-        <i-select @on-change="inits" v-model="params.status" placeholder="选择状态" filterable style="width:120px" :clearable="isClearAble">
-            <Option value="0">待审核</Option>
-            <Option value="1">已审核</Option>
-            <Option value="2">待审定</Option>
-            <Option value="-1">全部</Option>
-        </i-select>
-        </Col>
-
         <!-- 日期查询 -->
-        <Col span="3">
-        <DatePicker type="date" style="width:210px" format="yyyy-MM-dd HH:mm:ss" v-model="params.startTime" @on-change="init" placeholder="请选择开始时间"></DatePicker>
+        <Col span="4" push=1>
+        <Date-picker type="datetimerange" v-model="params.dateTime" format="yyyy-MM-dd HH:mm" @on-change="inits" placeholder="选择日期和时间" style="width: 300px"></Date-picker>
         </Col>
-        <Col span="3">
-        <DatePicker type="date" style="width:210px" format="yyyy-MM-dd HH:mm:ss" v-model="params.endTime" @on-change="init" placeholder="请选择结束时间"></DatePicker>
+        <Col span="4" push=3>
+        <Input v-model="params.wangwangnum" @on-change="inits" placeholder="请输入客户名"  clearable filterable/>
         </Col>
-
-        <!-- <Col>
-                <i-col>
-                    <Date-picker type="daterange" :options="options2" placement="bottom-end" placeholder="选择日期" style="width: 200px"></Date-picker>
-                </i-col>
-            </Col>   -->
-
+        <Col span="4" push=5>
+        <Input v-model="params.shopptype" @on-change="inits" placeholder="请输入店铺类型"  :clearable="isClearAble" />
+        </Col>
+    </Row>
+    <Row style="margin-top:5px">
         <!-- 查询 -->
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.wangwangnum" style="width:120px" @on-change="inits" placeholder="请输入客户名"  clearable filterable/>
+        <Col span="4" push=5>
+        <Input v-model="params.username1" @on-change="inits" placeholder="请输入店长"  clearable filterable />
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.shopptype" style="width:120px" @on-change="inits" placeholder="请输入店铺类型"  :clearable="isClearAble" />
+        <Col span="4" push=7>
+        <Input v-model="params.username2" @on-change="inits" placeholder="请输入招商顾问"  clearable filterable />
         </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.username1" style="width:120px" @on-change="inits" placeholder="请输入店长"  clearable filterable />
-        </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.username2" style="width:120px" @on-change="inits" placeholder="请输入招商顾问"  clearable filterable />
-        </Col>
-        <Col span="2" style="margin-left: 10px">
-        <Input v-model="params.teamname" style="width:120px" @on-change="inits" placeholder="请输入团队"  clearable filterable />
+        <Col span="4" push=9>
+        <Input v-model="params.teamname" @on-change="inits" placeholder="请输入团队"  clearable filterable />
         </Col>
 
         <!-- 搜索按钮 -->
-        <Col span="1" style="margin-left: 5px">
+        <Col span="1" push=10>
         <span><Button type="primary" @click="inits" icon="search">搜索</Button></span>
         </Col>
-
     </Row>
 
     <!-- 界面表格 -->
@@ -74,34 +63,6 @@
         </div>
     </Row>
 
-    <!--上传文件-->
-    <Modal v-model="ts" @on-ok="fileAdd" @on-cancel="cancelEdit">
-        <h3 slot="header" style="color:#2D8CF0">上传文件</h3>
-
-        <template>
-            <Upload ref="upload" name="file" :show-upload-list="false" :on-success="handleSuccess" :multiple="true" action="http://192.168.1.112:9090/mj-admin/sys/refund/uploads" style="display: inline-block;width:58px;">
-                <div style="width: 58px;height:58px;line-height: 58px;">
-                    <Icon type="ios-camera" size="30"></Icon>
-                </div>
-            </Upload>
-        </template>
-
-        <!-- <template>
-            <template v-if="item.status === 'finished'">
-                <img :src="item.url">
-                <div class="demo-upload-list-cover">
-                    <Icon type="ios-trash-outline" @click.native="handleRemove(item)"></Icon>
-                </div>
-            </template>
-            <Upload ref="upload" :show-upload-list="false" :on-success="handleSuccess" name="file" :multiple="true" action="http://localhost:8090/sys/refund/uploads" 
-                    style="display: inline-block;width:58px;">
-                <div style="width: 58px;height:58px;line-height: 58px;">
-                    <Icon type="ios-camera" size="30"></Icon>
-                    <p>点击或将文件拖拽到这里上传</p>
-                </div>
-            </Upload>
-        </template> -->
-    </Modal>
 
     <!-- 增加退款弹窗，点击增加按钮弹出 -->
     <Modal v-model="showAddModal" @on-ok="save" @on-cancel="cancel">
@@ -156,41 +117,36 @@
     </Modal>
 
     <!-- 详情 -->
-    <Modal v-model="showEditModalAll" @on-ok="saveEdit" @on-cancel="cancelEdit" width=752>
+    <Modal v-model="showEditModalAll" @on-ok="saveEdits" @on-cancel="cancelEdit" width=752>
         <h3 slot="header" style="color:#2D8CF0">详情</h3>
         <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" inline>
             <div style="width:210px;float:left">
-                <FormItem label="服务期" prop="deadline">
+                <FormItem label="服务期" prop="deadline" v-if="showEditForm.deadline != null">
                     <Input disabled v-model="showEditForm.deadline" style="width:120px" />
                 </FormItem>
-                <FormItem label="招商顾问" prop="username2">
-                    <Input disabled v-model="showEditForm.username2" style="width:120px" />
+                <FormItem label="招商顾问" prop="pname" v-if="showEditForm.pname != null">
+                    <Input disabled v-model="showEditForm.pname" style="width:120px" />
                 </FormItem>
-                <FormItem label="合同金额" prop="turnovermoney">
+                <FormItem label="合同金额" prop="turnovermoney" v-if="showEditForm.turnovermoney != null">
                     <Input disabled v-model="showEditForm.turnovermoney" style="width:120px" />
                 </FormItem>
-                <FormItem label="退款金额" prop="refundAmount">
+                <FormItem label="退款金额" prop="refundAmount" v-if="showEditForm.refundAmount != null">
                     <Input disabled v-model="showEditForm.refundAmount" style="width:120px" />
                 </FormItem>
-                <!-- <FormItem label="场景还原" prop="scenarioReduction">
-                    <Upload ref="upload" name="file" action="http://localhost:8090/sys/refund/upload" :on-success="handleSuccess" :on-format-error="handleFormatError">
-                        <i-button type="primary" icon="ios-cloud-upload-outline">上传文件</i-button>
-                    </Upload>
-                </FormItem> -->
             </div>
             <div style="width:270px;float:left">
-                <FormItem label="退款客户" prop="wangwangnum">
+                <FormItem label="退款客户" prop="wangwangnum" v-if="showEditForm.wangwangnum != null">
                     <Input disabled v-model="showEditForm.wangwangnum" style="width:150px" />
                 </FormItem>
 
-                <FormItem label="客户类型">
+                <FormItem label="客户类型" v-if="showEditForm.custtype != null">
                     <div>
                         <Input disabled v-model="showEditForm.custtype" style="width:75px" />
                         <Input disabled v-model="showEditForm.childtype" style="width:75px" />
                     </div>
                 </FormItem>
 
-                <FormItem label="退款渠道" prop="refundChannel">
+                <FormItem label="退款渠道" prop="refundChannel" v-if="showEditForm.refundChannel != null">
                     <select v-model="showEditForm.refundChannel" disabled style="width: 160px;height:35px">
                         <option value="1">SEM在线订购</option>
                         <option value="2">支付宝转账</option>
@@ -202,39 +158,58 @@
                         <option value="8">微信支付</Option>
                     </select>
                 </FormItem>
-                <FormItem label="退款时间" prop="hDate">
+                <FormItem label="退款时间" prop="hDate" v-if="showEditForm.hDate != null">
                     <i-col span="11">
                         <DatePicker type="datetime" readonly disabled format="yyyy-MM-dd HH:mm" v-model="showEditForm.hDate" style="width:160px"></DatePicker>
                     </i-col>
                 </FormItem>
             </div>
             <div style="width:240px;float:left">
-                <FormItem label="店铺类型" prop="shopptype">
+                <FormItem label="店铺类型" prop="shopptype" v-if="showEditForm.shopptype != null">
                     <Input disabled v-model="showEditForm.shopptype" style="width:120px" />
                 </FormItem>
 
-                <FormItem label="店长" prop="username1  ">
-                    <Input disabled v-model="showEditForm.username1" style="width:120px" />
+                <FormItem label="店长" prop="tename" v-if="showEditForm.tename != null">
+                    <Input disabled v-model="showEditForm.tename" style="width:120px" />
                 </FormItem>
-                <FormItem label="所属团队" prop="teamname">
+                <FormItem label="店长所属团队" prop="teamname" v-if="showEditForm.teamname != null">
                     <Input disabled v-model="showEditForm.teamname" style="width:120px" />
                 </FormItem>
 
             </div>
             <div style="width:500px">
-                <FormItem label="退款原因" prop="refundCause">
+                <FormItem label="退款原因" prop="refundCause" v-if="showEditForm.refundCause != null">
                     <Input disabled v-model="showEditForm.refundCause" style="width:500px" type="textarea" />
                 </FormItem>
-                <FormItem label="备注" prop="remark">
+                <FormItem label="备注" prop="remark" v-if="showEditForm.remark != null">
                     <Input disabled v-model="showEditForm.remark" style="width:500px" type="textarea" />
                 </FormItem>
             </div>
-            <!-- <FormItem label="场景还原" prop="scenarioReduction">
-                <a :href='showEditForm.scenarioReduction' target="_blank">{{showEditForm.scenarioReduction}}</a>
-            </FormItem> -->
+            <Row>
+             <Col span="12">
+                    <FormItem label="客诉大类别" prop="parentName" v-if="showEditForm.level != null">
+                        <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 200px">
+                            <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
+                            {{levelId.parentName}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+                <Col span="12">
+                    <FormItem label="客诉小类别" prop="complaintName" v-if="showEditForm.level != null">
+                        <Select v-model="showEditForm.sonLevel" placeholder="Select your pkId" style="width: 200px">
+                            <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName"
+                                    :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+                            {{complaintNameId.complaintName}}
+                            </Option>
+                        </Select>
+                    </FormItem>
+                </Col>
+            </Row>
+             <FormItem label="外因" prop="externalCause" v-if="showEditForm.externalCause != null">
+                    <Input v-model="showEditForm.externalCause" style="width:500px" type="textarea" />
+                </FormItem>
         </Form>
-        <!-- <h5>场景还原</h5>
-        <Table border ref="selection" :columns="columns1" :current="params.pageNum" :data="data1" width=100%></Table> -->
     </Modal>
 
     <!-- 修改，点击修改按钮弹出 -->
@@ -326,8 +301,15 @@
     </Modal>
 
     <!-- 文件列表 -->
-    <Modal v-model="fileModal" @on-ok="fileTable" @on-visible-change="resetDate1" @on-cancel="cancelFileList" width=50%>
-        <h3 slot="header" style="color:#2D8CF0">历史记录</h3>
+    <Modal v-model="fileModal" @on-ok="fileTable" @on-visible-change="resetDate1" @on-cancel="cancelFileList" width=30%>
+        <h3 slot="header" style="color:#2D8CF0">文件列表</h3>
+        <template>
+            <Upload ref="upload" name="file" :show-upload-list="false" :on-success="handleSuccess" :multiple="true" action="http://192.168.1.112:9090/mj-admin/sys/refund/uploads" style="display: inline-block;width:58px;">
+                <div style="width: 58px;height:58px;line-height: 58px;">
+                    <Icon type="ios-camera" size="30"></Icon>
+                </div>
+            </Upload>
+        </template>
         <Table border ref="selection" :columns="columns3" :data="data3" width=100%>
         </Table>
     </Modal>
@@ -362,9 +344,10 @@ export default { //主方法
                 username1: '',
                 username2: '',
                 teamname: '',
-                startTime: '',
-                endTime: '',
-                status: -1
+                dateTime:'',
+                // startTime: '',
+                // endTime: '',
+                result: -1
             },
             params1: {
                 level: 0,
@@ -379,8 +362,12 @@ export default { //主方法
             pageNumber: [], //表格页数
             length: [], //表格每页长度
             size: [], //批量删除时候选中的个数
-            showModal: false, //不显示 
+            showModal: false, //不显示
             fileModal: false,
+            //客诉大类别
+            levels:[],
+            //客诉小类别
+            levelNames:[],
             showAddForm: {
                 wangwangnum: '',
                 refundDate: '',
@@ -408,12 +395,23 @@ export default { //主方法
                 username2: '',
                 // technologyrecruitmentid:'',
                 teamname: '',
-                status: '',
+                result: '',
                 isDelete: '',
                 deadline: '',
-                // externalCause:'',
+                externalCause:'',
+                level:'',
+                sonLevel:'',
+                parentId:'',
+                externalCause:'',
+                tename:'',
+                pname:'',
             },
-
+            complaintIds:{
+                pkId: '',
+                parentId: '',
+                complaintName:'',
+                parentName:'',
+            },
             showFileForm: {
                 url: '',
                 name: '',
@@ -488,11 +486,11 @@ export default { //主方法
                 },
                 {
                     title: '状态',
-                    key: 'status',
+                    key: 'result',
                     render: (h, params) => {
-                        const row = params.row;
-                        const color = row.status == 0 ? 'green' : (row.status == 1 ? 'red' : 'blue');
-                        const text = row.status == 0 ? '待审核' : (row.status == 1 ? "已审核" : "待审定");
+                        const result = params.row.result;
+                        const color = result == 0 ? '#68838B' : (result == 1 ? '#20B2AA' : (result == 2 ? '#FF0000' : (result == 3 ? '#8B008B' : (result == 4 ? '#BC8F8F' : '#63B8FF'))));
+                        const text = result == 0 ? '微责' : (result == 1 ? '无责' : (result == 2 ? '重责' : (result == 3 ? '中责' : (result == 4 ? '轻责' : '待定'))));
                         return h('Tag', {
                             props: {
                                 color: color
@@ -501,6 +499,7 @@ export default { //主方法
                     },
                     align: 'center'
                 },
+
                 {
                     title: '退款原因',
                     align: 'center',
@@ -572,20 +571,6 @@ export default { //主方法
                                 }
                             }
                         }, '历史记录');
-                        let uploadBtn = h('Button', {
-                            props: {
-                                type: 'warning',
-                                size: 'small'
-                            },
-                            style: {
-                                marginRight: '3px'
-                            },
-                            on: {
-                                click: () => {
-                                    this.uploadAdd(params);
-                                }
-                            }
-                        }, '上传附件');
                         let fileBtn = h('Button', {
                             props: {
                                 type: 'success',
@@ -601,7 +586,7 @@ export default { //主方法
                             }
                         }, '附件');
                         return h(
-                            'div', [editBtn, deleteBtn, uploadBtn, showBtn, fileBtn]
+                            'div', [editBtn, deleteBtn, showBtn, fileBtn]
                         );
 
                     }
@@ -609,70 +594,76 @@ export default { //主方法
             ],
 
             //历史记录表格
-            columns2: [{
+            columns2: [
+                {
+                    title: '类型',
+                    align: 'center',
+                    render: (h, params) => {
+                    const row = params.row;
+                    const color=row.type==0 ? 'green' :(row.type ==1 ? 'red':(row.type ==2 ?'blue':'purple'));
+                    const text=row.type==0 ? '投诉' :(row.type ==1 ? "隐患":(row.type ==2? '退款':'其他'));
+                    return h('Tag', {
+                    props: {
+                        color: color
+                    }
+                    }, text);
+                    },
+                    align: 'center'
+                },
+                {
+                    title: '判责结果',
+                    align: 'center',
+                    render: (h, params) => {
+                    const row = params.row;
+                    const color=row.result==0 ? 'green' :(row.result ==1 ? 'red':(row.result ==2 ? 'blue':(row.result == 3 ? 'purple ':(row.result == 4 ? 'pink':'orange'))));
+                    const text=row.result==0 ? '微责' :(row.result ==1 ? "无责":(row.result == 2 ? '重责':(row.result == 3 ? '轻责': (row.result == 4 ? '中责':'待定'))));
+                    return h('Tag', {
+                    props: {
+                        color: color
+                    }
+                    }, text);
+                    },
+                    align: 'center'
+                },
+                {
+                    title: '日期',
+                    align: 'center',
+                    key: 'createTime'
+                },
+                {
                     title: '客户',
                     align: 'center',
                     key: 'wangwangnum'
                 },
                 {
-                    title: '店长',
+                    title: '次数(第几次)',
                     align: 'center',
-                    key: 'username1'
-                },
-                {
-                    title: '退款金额',
-                    align: 'center',
-                    render: (h, params) => {
+                     render: (h, params) => {
                         return h('div', [
                             h('span', {
                                 style: {
                                     display: 'block'
                                 }
-                            }, params.row.refundAmount + "元"),
+                            }, "该用户的第"+params.row.frequency + "次"),
                         ]);
                     },
-                    // key:'refundAmount'
                 },
                 {
-                    title: '退款原因',
-                    align: 'center',
-                    ellipsis: true,
-                    key: 'refundCause',
+                    title: '状态',
+                    key: 'result',
                     render: (h, params) => {
-                        return h('div', [
-                            h(
-                                'span', {
-                                    style: {},
-                                    //就是这里加的属性
-                                    domProps: {
-                                        title: params.row.refundCause,
-                                    }
-                                },
-                                params.row.refundCause,
-                            )
-                        ])
-                    }
-                },
-                {
-                    title: '退款时间',
-                    align: 'center',
-                    key: 'refundDate'
-                },
-                {
-                    title: '审核状态',
-                    align: 'center',
-                    key: 'status',
-                    render: (h, params) => {
-                        const row = params.row;
-                        const color = row.status == 0 ? 'green' : (row.status == 1 ? 'red' : 'blue');
-                        const text = row.status == 0 ? '待审核' : (row.status == 1 ? "已审核" : "待审定");
+                        const result = params.row.result;
+                        const color = result == 0 ? '#68838B' : (result == 1 ? '#20B2AA' : (result == 2 ? '#FF0000' : (result == 3 ? '#8B008B' : (result == 4 ? '#BC8F8F' : '#63B8FF'))));
+                        const text = result == 0 ? '微责' : (result == 1 ? '无责' : (result == 2 ? '重责' : (result == 3 ? '中责' : (result == 4 ? '轻责' : '待定'))));
                         return h('Tag', {
                             props: {
                                 color: color
                             }
                         }, text);
                     },
+                    align: 'center'
                 },
+
                 {
                     title: '操作',
                     key: 'action',
@@ -824,28 +815,6 @@ export default { //主方法
             this.loading = false;
         },
 
-        // init1() {
-        //     //列表数据初始化
-        //     this.loading = true;
-        //     console.log("2222222222222222223333333333")
-        //     let refundId = this.showFileForm.refundId;
-        //     API.refundList.listFile(this.showFileForm).then(({
-        //         data
-        //     }) => {
-        //         console.log("id为外：" + this.showFileForm.refundId);
-        //         if (data && data.code == 0) {
-        //             this.data3 = data.data.list;
-        //             console.log("id为内：" + this.showFileForm.refundId);
-        //             // this.init1();
-        //         } else {
-        //             this.$Message.error(data.msg);
-        //         }
-        //     }).catch((data) => {
-        //         this.$Message.error('连接失败，请检查网络！');
-        //     });
-        //     this.loading = false;
-        // },
-
         pageChange(num) {
             this.params.pageNum = num;
             this.pageNumber = num;
@@ -874,7 +843,7 @@ export default { //主方法
                     username2: '',
                     // technologyrecruitmentid:'',
                     teamname: '',
-                    status: '',
+                    result: '',
                     isDelete: '',
                     deadline: '',
                 };
@@ -898,28 +867,10 @@ export default { //主方法
         //批量上传文件
         uploadAdd(params, showFileForm) {
             this.ts = true;
-            // this.params.id = params.row.pkId;
             let complaintId = params.row.pkId;
             this.showFileForm.complaintId = complaintId;
-            console.log("11111111111111111111111complaintId为:"+complaintId);
-            // params2.refundId = refundId;
-            // console.log("111111111111:" + refundId);
-            // console.log("fowrjoejri30918498240:" + this.showFileForm.refundId);
-            //调用addFile，将id传给file数据库
-            //  API.complaintList.listById(this.params).then(({data}) =>{
-            //    if (data && data.code == 0) {
-            //     this.data3 = data.data;
-            //     this.params.id='';
-            //   } else {
-            //     this.$Message.error(data.msg);
-            //   }
-            // }).catch((data) => {
-            //   this.$Message.error('连接失败，请检查网络！');
-            // });
             this.loading = false;
         },
-
-        //获取上传的pk_id，调用添加接口
 
         //上传
         //上传成功之后的方法
@@ -927,30 +878,36 @@ export default { //主方法
             let _this = this;
             if (res.code == 0) {
                 alert("上传中");
-                // this.complaintId = data.data;
                 let scenerestoration = file.response.data;
                 this.url = scenerestoration.url;
                 this.name = scenerestoration.name;
-                let name = this.name;
-                let url = this.url;
                 this.showFileForm.url = this.url;
-                // let refundId = this.refundId;
-                // console.log("name为" + name);
-                // console.log("id为"+refundId);
-                // console.log("url为："+url);
-                this.showFileForm.name = name;
-                // this.showFileForm.refundId =refundId;
+                this.showFileForm.name = this.name;
+                API.refundList.addFile(this.showFileForm).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.init();
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                });
+                API.refundList.listFile(this.showFileForm).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.data3 = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                });
             } else {
                 alert("上传失败");
             }
         },
-        //上传错误回调
-        // handleFormatError(file) {
-        //     this.$Notice.warning({
-        //         title: 'The file format is incorrect',
-        //         desc: 'File format of ' + file.name + ' is incorrect, please select jpg or png.'
-        //     });
-        // },
+
         save() {
             API.refundList.insert(this.showAddForm).then(({
                 data
@@ -1018,6 +975,19 @@ export default { //主方法
 
         //详情
         showEditModalDataAll(params) {
+            //大类
+            API.complaintList.selectLevel(this.params).then(({data}) => {
+                console.log("进来喽哦");
+                if (data && data.code == 0) {
+                this.levels = data.data;
+                console.log("大类");
+                console.log(this.levels);
+                } else {
+                this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
             this.showEditModalAll = true;
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
@@ -1027,9 +997,9 @@ export default { //主方法
                 this.showEditForm.scenarioReduction = Refund.scenarioReduction;
                 this.showEditForm.remark = Refund.remark;
                 this.showEditForm.refundAmount = Refund.refundAmount;
-                this.showEditForm.status = Refund.status;
+                this.showEditForm.result = Refund.result;
                 this.showEditForm.isDelete = Refund.isDelete;
-                this.showEditForm.hDate = Refund.refundDate; 
+                this.showEditForm.hDate = Refund.refundDate;
                 this.showEditForm.refundCause = Refund.refundCause;
                 this.showEditForm.level = Refund.level;
                 this.showEditForm.custtype = Refund.custtype;
@@ -1042,7 +1012,11 @@ export default { //主方法
                 this.showEditForm.username1 = Refund.username1;
                 this.showEditForm.username2 = Refund.username2;
                 this.showEditForm.shopptype = Refund.shopptype;
-                // this.showEditForm.externalCause = Refund.externalCause;
+                this.showEditForm.level = Refund.level;
+                this.showEditForm.sonLevel = Refund.sonLevel;
+                this.showEditForm.externalCause = Refund.externalCause;
+                this.showEditForm.parentId = Refund.parentId;
+                this.showEditForm.externalCause = Refund.externalCause;
             }
         },
 
@@ -1050,8 +1024,7 @@ export default { //主方法
         showEditModalData(params) {
             this.showEditModal = true;
             this.showFileForm.complaintId = params.row.pkId;
-            // console.log("值为:"+params.row.pkId);
-            // console.log("22222222222222222222conplaintId值为:"+this.showFileForm.complaintId);
+            this.params1.parentId=this.showEditForm.level;
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
                 this.showEditForm.pkId = Refund.pkId;
@@ -1060,10 +1033,10 @@ export default { //主方法
                 this.showEditForm.scenarioReduction = Refund.scenarioReduction;
                 this.showEditForm.remark = Refund.remark;
                 this.showEditForm.refundAmount = Refund.refundAmount;
-                this.showEditForm.status = Refund.status;
+                this.showEditForm.result = Refund.result;
                 this.showEditForm.isDelete = Refund.isDelete;
                 this.showEditForm.refundDate = Refund.refundDate;
-                this.showEditForm.hDate = Refund.refundDate; 
+                this.showEditForm.hDate = Refund.refundDate;
                 this.showEditForm.refundCause = Refund.refundCause;
                 this.showEditForm.level = Refund.level;
                 this.showEditForm.custtype = Refund.custtype;
@@ -1076,9 +1049,9 @@ export default { //主方法
                 this.showEditForm.username1 = Refund.username1;
                 this.showEditForm.username2 = Refund.username2;
                 this.showEditForm.shopptype = Refund.shopptype;
-                // this.showEditForm.externalCause = Refund.externalCause;
-                // console.log("修改:退款金额为1111111111111111111:"+Refund.turnovermoney);
-                // console.log("修改:退款金额为2222222222222222222:"+this.showEditForm.turnovermoney);
+                this.showEditForm.tename = Refund.username1;
+                this.showEditForm.pname = Refund.username2;
+                console.log("shia kjfj"+this.showEditForm.tename);
             }
         },
 
@@ -1205,12 +1178,12 @@ export default { //主方法
             // 数据初始化
             this.loading = true;
             /*data是接口返回的data*/
-            API.refundList.listByWangWangNum(this.params).then(({
+            API.complaintList.listByWangWangNum(this.params).then(({
                 data
             }) => {
                 if (data && data.code == 0) {
                     this.data2 = data.data;
-                    // console.log("data2"+this.data2);
+                    console.log("data2"+this.data2);
                     this.params.wangwangnum = '';
                 } else {
                     this.$Message.error(data.msg);
@@ -1232,6 +1205,34 @@ export default { //主方法
         cancelFileList() {
             this.fileModal = false;
         },
+        //点击客诉大类别
+            selectLevel(params){
+            this.params1.parentId=this.showEditForm.level;
+            this.showEditForm.parentId = this.params1.parentId;
+            this.showEditForm.pkId = this.showEditForm.sonLevel;
+            //小类
+            API.complaintList.getLevelName(this.params1).then(({data}) => {
+                if (data && data.code == 0) {
+                this.levelNames = data.data.list;
+                } else {
+                this.$Message.error(data.msg);
+                }
+                }).catch((data) => {
+                    this.$Message.error('当前没有判责');
+                    });
+            },
+        //点击详情确定可以修改客诉信息
+        saveEdits(){
+            API.responsibilityList.update(this.showEditForm).then(({data}) => {
+                    if (data && data.code == 0) {
+                    this.init();
+                    } else {
+                    this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                })
+        }
     }
 }
 </script>
