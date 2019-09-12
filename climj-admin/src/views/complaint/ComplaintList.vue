@@ -41,12 +41,15 @@
           </Select>
       </col>
       <Col span="4" style="margin-left: 0px">
-        <Select @on-change="searchComplaint" v-model="params.status" placeholder="选择状态" style="width:200px" clearable filterable>
-        <Option value="0">待审核</Option>
-        <Option value="1">已审核</Option>
-        <Option value="2">待审定</Option>
-        <Option value="-1">全部</Option>
-      </Select>
+          <!-- 状态选择 -->
+        <i-select @on-change="searchComplaint" v-model="params.result" placeholder="选择状态" filterable :clearable="isClearAble" style="width:210px">
+            <Option value="0">微责</Option>
+            <Option value="1">无责</Option>
+            <Option value="2">重责</Option>
+            <Option value="3">中责</Option>
+            <Option value="4">轻责</Option>
+            <Option value="5">待定</Option>
+        </i-select>
       </Col>
         <!-- 日期查询 -->
         <Col span="3">
@@ -802,7 +805,7 @@ import Vue from 'vue';
             pageNum: 1,
             pagesize: 10,
             keyword: '',
-            status:-1,
+            result:-1,
             dateTime:'',
             // startTime:'',
             // endTime:'',
@@ -1183,7 +1186,7 @@ import Vue from 'vue';
                   },
                   on: {
                     click: () => {
-                      this.showEditModalData(params);
+                      this.showData(params);
                     }
                   }
                 }, '查看');
@@ -1616,8 +1619,9 @@ import Vue from 'vue';
           this.showAddModal=false;
 
         },
+        //点击修改
         showEditModalData(params){
-          this.showEditModalAll=true;
+          this.showEditModal=true;
           //大类
           // API.complaintList.selectLevel(this.params).then(({data}) => {
           //   if (data && data.code == 0) {
@@ -1821,6 +1825,54 @@ import Vue from 'vue';
         },
         saveTable(){this.showModal=false;},
         cancelTable(){this.showModal=false;},
+        //点击详情
+        showData(params){
+            this.showEditModalAll = true;
+             if (typeof params.row != 'undefined') {
+            const Complaint = params.row;
+            this.showEditForm.pkId = Complaint.pkId;
+            this.showEditForm.wangwangnum=Complaint.wangwangnum;
+            this.showEditForm.channel = Complaint.channel;
+            //数组转取出情景还原url
+            // let scenerestoration = Complaint.scenerestoration;
+            // this.url = JSON.parse(scenerestoration);
+            // // this.showEditForm.scenerestoration = Complaint.scenerestoration;
+            // this.showEditForm.sceneRestorationName = Complaint.sceneRestorationName;
+            this.showEditForm.shopptype = Complaint.shopptype;
+            this.showEditForm.remarks = Complaint.remarks;
+            this.showEditForm.responsibility = Complaint.responsibility;
+            this.showEditForm.frequency = Complaint.frequency;
+            // this.showEditForm.level = Complaint.level;
+            // this.showEditForm.result = Complaint.result;
+            this.showEditForm.teamname=Complaint.teamname;
+            this.showEditForm.username = Complaint.username;
+            this.showEditForm.content = Complaint.content;
+            this.showEditForm.shopptype = Complaint.shopptype;
+            this.showEditForm.department = Complaint.department;
+            this.showEditForm.custtype = Complaint.custtype;
+            this.showEditForm.worktype = Complaint.worktype;
+            this.showEditForm.personnelid=Complaint.personnelid;
+            this.showEditForm.technologyRecruitmentid=Complaint.technologyRecruitmentid;
+            this.showEditForm.tscustomer=Complaint.tscustomer;
+            // this.showEditForm.parentId = Complaint.parentId;
+            this.showEditForm.complaintName = Complaint.complaintName;
+            // this.showEditForm.complaintid = Complaint.complaintid;
+            // this.showEditForm.sonId = Complaint.sonId;
+            this.showEditForm.status = Complaint.status;
+            this.showEditForm.complaintdate = Complaint.complaintdate;
+            this.showEditForm.tename=Complaint.tename;
+
+            this.showEditForm.turnover = Complaint.turnover;
+            this.showEditForm.number = Complaint.number;
+            this.showEditForm.industry = Complaint.industry;
+            this.showEditForm.followPersonel = Complaint.followPersonel;
+            this.showEditForm.followProcess = Complaint.followProcess;
+            this.showEditForm.processingScheme = Complaint.processingScheme;
+
+            this.showEditForm.pname = Complaint.pname;
+            this.showEditForm.tename = Complaint.tename;
+            }
+        },
         //点击确定详情
         saveEdits(){
           API.responsibilityList.update(this.showEditForm).then(({data}) => {

@@ -47,7 +47,7 @@
         <Input v-model="params.username2" style="width:200px" @on-change="search" placeholder="请输入招商顾问" clearable/>
         </Col>
         <Col span="4" push=4>
-        <Input v-model="params.teamname" style="width:200px" @on-change="search" placeholder="请输入团队" clearable/>
+        <Input v-model="params.TeamName" style="width:200px" @on-change="search" placeholder="请输入团队" clearable/>
         </Col>
         <Col span="4" push=4>
         <Input v-model="params.frequency" style="width:200px" @on-change="search" placeholder="请输入隐患次数" clearable />
@@ -212,7 +212,7 @@
                 </Col>
             </Row>
              <FormItem label="外因" prop="externalCause" v-if="modifierForm.externalCause != null">
-                    <Input v-model="modifierForm.externalCause" style="width:500px" type="textarea" />
+                    <Input v-model="modifierForm.externalCause" style="width:400px" type="textarea" />
                 </FormItem>
         </Form>
     </Modal>
@@ -253,9 +253,11 @@ export default {
                 shopptype: '',
                 username1: '',
                 username2: '',
-                teamname: '',
+                TeamName: '',
                 frequency: '',
                 dateTime:'',
+                PersonnelID:-1,
+                TScustomer:'',
                 // startTime: '',
                 // endTime: '',
                 result: -1

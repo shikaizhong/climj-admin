@@ -555,7 +555,7 @@ export default {
                 {
                     title: '判责日期',
                     align: 'center',
-                    key: 'createTime',
+                    key: 'reDate',
                     sortable: true
                 },
                 {
@@ -800,7 +800,7 @@ export default {
                 teamname:'',
                 tename:'',
                 isDelete: '',
-                createTime: '',
+                reDate: '',
                 complaintid: '',
                 personnelid: '',
                 technologyRecruitmentid: '',
@@ -867,7 +867,7 @@ export default {
                 result:'',
                 responsibilityer:'',
                 grade:'',
-                createTime:'',
+                reDate:'',
                 responsibilityor:'',
                 complaintId:'',
                 type:'',
@@ -993,8 +993,8 @@ export default {
                  this.showEditForm.result = responsibilityList.result;
                  this.showEditForm.responsibilityer = responsibilityList.responsibilityer;
                  this.showEditForm.grade = responsibilityList.grade;
-                 this.showEditForm.createTime = responsibilityList.createTime;
-                 this.showEditForm.hDate = responsibilityList.createTime;
+                 this.showEditForm.reDate = responsibilityList.reDate;
+                 this.showEditForm.hDate = responsibilityList.reDate;
                  this.showEditForm.responsibilityor = responsibilityList.responsibilityor;
                  this.showEditForm.summary = responsibilityList.summary;
                  this.showEditForm.basic = responsibilityList.basic;

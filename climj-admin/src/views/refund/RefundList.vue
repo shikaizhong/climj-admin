@@ -12,7 +12,7 @@
             <Option value="2">重责</Option>
             <Option value="3">中责</Option>
             <Option value="4">轻责</Option>
-            <Option value="5">待定</Option>
+            <!-- <Option value="5">待定</Option> -->
         </i-select>
         <!-- <span ><Button  type="error"  @click="this.delete" icon="trash-a">批量删除</Button></span> -->
         </Col>
@@ -36,7 +36,7 @@
         <Input v-model="params.username2" @on-change="inits" placeholder="请输入招商顾问"  clearable filterable />
         </Col>
         <Col span="4" push=9>
-        <Input v-model="params.teamname" @on-change="inits" placeholder="请输入团队"  clearable filterable />
+        <Input v-model="params.TeamName" @on-change="inits" placeholder="请输入团队"  clearable filterable />
         </Col>
 
         <!-- 搜索按钮 -->
@@ -343,11 +343,13 @@ export default { //主方法
                 shopptype: '',
                 username1: '',
                 username2: '',
-                teamname: '',
+                TeamName: '',
                 dateTime:'',
                 // startTime: '',
                 // endTime: '',
-                result: -1
+                result: -1,
+                TScustomer:'',
+                PersonnelID:-1,
             },
             params1: {
                 level: 0,
@@ -398,7 +400,6 @@ export default { //主方法
                 result: '',
                 isDelete: '',
                 deadline: '',
-                externalCause:'',
                 level:'',
                 sonLevel:'',
                 parentId:'',
