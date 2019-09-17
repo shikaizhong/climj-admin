@@ -47,7 +47,7 @@ export function listById(params) {
 export function listByWangWangNum(params) {
   return request({
     method: 'post',
-    url: requestURL('/sys/complaint/selectInfoByWangWangNum'),
+    url: requestURL('/sys/complaint/selectAllByWangWangNum'),
     data: requestParam(params, 'post', true, 'json')
   })
 }
