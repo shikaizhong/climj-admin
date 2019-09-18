@@ -47,7 +47,7 @@
 
     <!-- 界面表格 -->
     <Row style="margin-top: 25px">
-        <Table border ref="selection" :columns="columns1" :current="params.pageNum" :data="data1" width=100%>
+        <Table border ref="selection" :columns="columns1" :current="params.pageNum" :data="historyDatas" width=100%>
         </Table>
     </Row>
     <!-- <Row>
@@ -59,7 +59,7 @@
     <!-- 分页 -->
     <Row>
         <div style="float:right">
-            <Page :total="totalCount" :page-size="params.pageSize" loading @on-change="pageChange" @on-page-size-change="sizeChange" />
+            <Page :total="totalCount" :page-size="pageSize" loading @on-change="pageChange" />
         </div>
     </Row>
 
@@ -124,10 +124,10 @@
         <h3 slot="header" style="color:#2D8CF0">详情</h3>
         <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser" inline>
             <FormItem label="客户名" prop="wangwangnum" v-if="showEditForm.wangwangnum != null">
-                <Input disabled v-model="showEditForm.wangwangnum" style="width:180px"/>
+                <Input disabled v-model="showEditForm.wangwangnum" style="width:180px" />
             </FormItem>
             <FormItem label="隐患次数" prop="frequency" v-if="showEditForm.frequency != null">
-                <Input disabled v-model="showEditForm.frequency" style="width:180px"/>
+                <Input disabled v-model="showEditForm.frequency" style="width:180px" />
             </FormItem>
             <FormItem label="客户类型" v-if="showEditForm.custtype != null">
                 <div style="width:180px">
@@ -273,11 +273,11 @@
                 </Select>
             </FormItem>
             <FormItem label="客诉小类别" prop="complaintName" v-if="showEditForm.level != null">
-                <Select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px">
-                    <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+                <select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px">
+                    <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                         {{complaintNameId.complaintName}}
-                    </Option>
-                </Select>
+                    </option>
+                </select>
             </FormItem>
             <FormItem label="原因" prop="content" v-if="showEditForm.content != null">
                 <Input v-model="showEditForm.content" disabled placeholder="请输入投诉内容" type="textarea" style="width:400px" />
@@ -370,17 +370,19 @@
                     <Input v-model="showEditForm.remark" style="width:500px" type="textarea" />
                 </FormItem>
             </div>
-            <FormItem label="客诉大类别" prop="parentName">
-                <i-select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 180px">
-                    <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
-                        {{levelId.parentName}}
-                    </Option>
-                </i-select>
-            </FormItem>
             <Row>
                 <Col span="12">
+                <FormItem label="客诉大类别" prop="parentName">
+                    <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 180px">
+                        <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
+                            {{levelId.parentName}}
+                        </Option>
+                    </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
                 <FormItem label="客诉小类别" prop="complaintName">
-                    <select v-model="showEditForm.sonLevel" placeholder="Select your pkId" style="width: 180px">
+                    <select v-model="showEditForm.complaintIds" placeholder="Select your pkId" style="width: 180px">
                         <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                             {{complaintNameId.complaintName}}
                         </option>
@@ -437,8 +439,6 @@ export default { //主方法
     data() {
         return {
             params: {
-                pageNum: 1,
-                pageSize: 10,
                 wangwangnum: '',
                 shopptype: '',
                 username1: '',
@@ -450,7 +450,7 @@ export default { //主方法
                 result: -1,
                 TScustomer: '',
                 PersonnelID: -1,
-                TeamName:'',
+                TeamName: '',
             },
             params1: {
                 level: 0,
@@ -459,7 +459,10 @@ export default { //主方法
             showEditModalAll: false, //不显示
             reViewModal: false, //不显示
             showAddModal: false, //不显示
+            ajaxHistoryDatas:[],
+            historyDatas:[],
             totalCount: 0,
+            pageSize: 10,
             ts: false,
             //添加按钮刚开始不显示
             confirmModal: false,
@@ -542,14 +545,8 @@ export default { //主方法
                 sceneRestorationName: '',
                 url: '',
                 name: '',
-                complaintId: '',
             },
-            complaintIds: {
-                pkId: '',
-                parentId: '',
-                complaintName: '',
-                parentName: '',
-            },
+            complaintids: [],
             showFileForm: {
                 url: '',
                 name: '',
@@ -926,6 +923,13 @@ export default { //主方法
                     // for(var i = 0;i<this.length;i++){
                     //     this.pkIds.push(data.data.list[i].pkIds);
                     // }
+                    this.ajaxHistoryDatas = data.data.list;
+                    this.totalCount = data.data.total;
+                    if(this.ajaxHistoryDatas<this.pageSize){
+                        this.historyDatas = this.ajaxHistoryDatas;
+                    }else{
+                        this.historyDatas = this.ajaxHistoryDatas.slice(0,this.pageSize);
+                    }
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -942,12 +946,17 @@ export default { //主方法
             }) => {
                 if (data && data.code == 0) {
                     this.data1 = data.data.list;
-                    // console.log("第一个data1为:"+this.data1);
                     this.totalCount = data.data.total;
                     this.length = data.data.list.length;
-                    // for(var i = 0;i<this.length;i++){
-                    //     this.pkIds.push(data.data.list[i].pkIds);
-                    // }
+                    //新增分页
+                    this.ajaxHistoryDatas = data.data.list;
+                    this.totalCount = data.data.total;
+                    if(this.ajaxHistoryDatas<this.pageSize){
+                        this.historyDatas = this.ajaxHistoryDatas;
+                    }else{
+                        this.historyDatas = this.ajaxHistoryDatas.slice(0,this.pageSize);
+                    }
+
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -971,15 +980,13 @@ export default { //主方法
             this.loading = false;
         },
 
-        pageChange(num) {
-            this.params.pageNum = num;
-            this.pageNumber = num;
-            this.init();
+        pageChange(index){
+            // console.log("12121212121212");
+            var _start = (index-1)*this.pageSize;
+            var _end = index*this.pageSize;
+            this.historyDatas = this.ajaxHistoryDatas.slice(_start,_end);
         },
-        sizeChange(size) {
-            this.params.pageSize = size;
-            this.init();
-        },
+        
         resetData(val) {
             if (!val) {
                 this.showEditForm = {
@@ -1140,16 +1147,28 @@ export default { //主方法
             API.complaintList.selectLevel(this.params).then(({
                 data
             }) => {
-                console.log("进来喽哦");
                 if (data && data.code == 0) {
                     this.levels = data.data;
-                    console.log("大类");
-                    console.log(this.levels);
+                    console.log(this.levels[0]);
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
+            });
+            this.params1.parentId = params.row.level;
+            console.log(params.row.level+"弗雷别");
+             //小类
+            API.complaintList.getLevelName(this.params1).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levelNames = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('当前没有判责');
             });
             this.showEditModalAll = true;
             if (typeof params.row != 'undefined') {
@@ -1178,17 +1197,15 @@ export default { //主方法
                 this.showEditForm.sonLevel = Refund.sonLevel;
                 this.showEditForm.externalCause = Refund.externalCause;
                 this.showEditForm.parentId = Refund.parentId;
-
                 this.showEditForm.complaintdate = Refund.complaintdate;
                 this.showEditForm.username = Refund.username;
                 this.showEditForm.channel = Refund.channel;
                 this.showEditForm.tename = Refund.tename;
-                console.log("店长为:" + Refund.tename);
                 this.showEditForm.turnover = Refund.turnover;
                 this.showEditForm.number = Refund.number;
                 this.showEditForm.industry = Refund.industry;
                 this.showEditForm.followPersonel = Refund.followPersonel;
-                console.log(this.showEditForm.followPersonel + "跟进人员为");
+
                 this.showEditForm.processingScheme = Refund.processingScheme;
                 this.showEditForm.followProcess = Refund.followProcess;
                 this.showEditForm.content = Refund.content;
@@ -1202,6 +1219,7 @@ export default { //主方法
                 this.showEditForm.technologyRecruitmentid = Refund.technologyRecruitmentid;
                 this.showEditForm.tscustomer = Refund.tscustomer;
                 this.showEditForm.complaintName = Refund.complaintName;
+                this.showFileForm.parentName = Refund.parentName;
                 this.showEditForm.pname = Refund.pname;
             }
         },
@@ -1209,27 +1227,33 @@ export default { //主方法
         //修改
         showEditModalData(params) {
             this.showEditModal = true;
-            this.showFileForm.complaintId = params.row.pkId;
-            this.params1.parentId = this.showEditForm.level;
-              //大类
             API.complaintList.selectLevel(this.params).then(({
                 data
             }) => {
-                console.log("进来喽哦");
                 if (data && data.code == 0) {
                     this.levels = data.data;
-                    console.log("大类");
-                    console.log(this.levels);
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             });
+            this.params1.parentId = params.row.level;
+             //小类
+            API.complaintList.getLevelName(this.params1).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levelNames = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('当前没有判责');
+            });
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
                 this.showEditForm.pkId = Refund.pkId;
-                console.log("主见为:"+Refund.pkId)
                 this.showEditForm.wangwangnum = Refund.wangwangnum;
                 this.showEditForm.refundChannel = Refund.refundChannel;
                 this.showEditForm.scenarioReduction = Refund.scenarioReduction;
@@ -1254,6 +1278,8 @@ export default { //主方法
                 this.showEditForm.shopptype = Refund.shopptype;
                 this.showEditForm.tename = Refund.username1;
                 this.showEditForm.pname = Refund.username2;
+                this.showEditForm.complaintIds = this.showEditForm.sonLevel;
+                console.log("变更后的小类别:"+this.showEditForm.complaintIds);
             }
         },
 
@@ -1407,9 +1433,9 @@ export default { //主方法
         },
         //点击客诉大类别
         selectLevel(params) {
-            this.params1.parentId = this.showEditForm.level;
+            // this.params1.parentId = this.showEditForm.level;
             this.showEditForm.parentId = this.params1.parentId;
-            this.showEditForm.pkId = this.showEditForm.sonLevel;
+            this.showEditForm.sonLevel = this.showEditForm.sonLevel;
             //小类
             API.complaintList.getLevelName(this.params1).then(({
                 data

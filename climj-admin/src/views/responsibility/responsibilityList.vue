@@ -59,12 +59,12 @@
     </Row>
     <!--table数据-->
     <Row style="margin-top: 25px">
-        <Table border ref="selection" :columns="columns1" :current="params.pageNum" @on-selection-change="selectionChange" :data="data1" width=100%>
+        <Table border ref="selection" :columns="columns1" :current="params.pageNum" @on-selection-change="selectionChange" :data="historyDatas" width=100%>
         </Table>
     </Row>
     <Row>
         <div style="float:right">
-            <Page :total="totalCount" :page-size="params.pageSize" loading show-sizer @on-change="pageChange" @on-page-size-change="sizeChange" />
+            <Page :total="totalCount" :page-size="pageSize" loading @on-change="pageChange" />
         </div>
     </Row>
     <!--修改-->
@@ -73,10 +73,42 @@
         <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
             <Row>
                 <Col span="12">
+                <FormItem label="签约人:" prop="pname">
+                    <input style="width: 300px" v-model="showEditForm.pname" placeholder="暂无数据" disabled />
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="签约人组别:" prop="pteamname">
+                    <input style="width: 300px" v-model="showEditForm.pteamname" placeholder="暂无数据" disabled />
+                </FormItem>
+                </Col>
+            </Row>
+            <Row>
+                <Col span="12">
+                <FormItem label="店长:" prop="tename">
+                    <input style="width: 300px" v-model="showEditForm.tename" disabled />
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="店长组别:" prop="teamname">
+                    <input style="width: 300px" v-model="showEditForm.teamname" disabled />
+                </FormItem>
+                </Col>
+            </Row>
+            <Row>
+                <Col span="12">
                 <FormItem label="客户:" prop="wangwangnum">
                     <input style="width: 300px" v-model="showEditForm.wangwangnum" disabled />
                 </FormItem>
                 </Col>
+                <Col span="12">
+                <FormItem label="签单日期" prop="serverdeadline">
+                    <DatePicker type="datetime" format="yyyy-MM-dd " v-model="showEditForm.serverdeadline" disabled placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
+                </FormItem>
+                </Col>
+
+            </Row>
+            <Row>
                 <Col span="12">
                 <FormItem label="客诉大类别" prop="parentName">
                     <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 300px">
@@ -86,20 +118,13 @@
                     </Select>
                 </FormItem>
                 </Col>
-            </Row>
-            <Row>
                 <Col span="12">
                 <FormItem label="客诉小类别" prop="complaintName">
-                    <Select v-model="showEditForm.sonLevel" placeholder="Select your pkId" style="width: 300px">
-                        <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+                    <select v-model="showEditForm.sonLevel" placeholder="Select your pkId" style="width: 300px" >
+                        <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                             {{complaintNameId.complaintName}}
-                        </Option>
-                    </Select>
-                </FormItem>
-                </Col>
-                <Col span="12">
-                <FormItem label="客诉点总结:" prop="summary">
-                    <Input placeholder="请输入客诉点总结" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" v-model="showEditForm.summary" />
+                        </option>
+                    </select>
                 </FormItem>
                 </Col>
             </Row>
@@ -110,17 +135,11 @@
                 </FormItem>
                 </Col>
                 <Col span="12">
-                <FormItem label="判责结果:" prop="result">
-                    <select placeholder="判责结果:" style="width: 300px;height:35px" v-model="showEditForm.result">
-                        <option value="0">微责</option>
-                        <option value="1">无责</option>
-                        <option value="2">重责</option>
-                        <option value="3">轻责</option>
-                        <option value="4">中责</option>
-                        <option value="5">待定</option>
-                    </select>
+                <FormItem label="处理方案:" prop="deal">
+                    <Input placeholder="请输入处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" v-model="showEditForm.deal" disabled />
                 </FormItem>
                 </Col>
+
             </Row>
             <Row>
                 <Col span="12">
@@ -150,34 +169,12 @@
                         </RadioGroup>
                     </FormItem>
                 </Col> -->
+
             <Row>
+
                 <Col span="12">
-                <FormItem label="签约人:" prop="pname">
-                    <input style="width: 300px" v-model="showEditForm.pname" placeholder="暂无数据" disabled />
-                </FormItem>
-                </Col>
-                <Col span="12">
-                <FormItem label="签约人组别:" prop="pteamname">
-                    <input style="width: 300px" v-model="showEditForm.pteamname" placeholder="暂无数据" disabled />
-                </FormItem>
-                </Col>
-            </Row>
-            <Row>
-                <Col span="12">
-                <FormItem label="店长:" prop="tename">
-                    <input style="width: 300px" v-model="showEditForm.tename" disabled />
-                </FormItem>
-                </Col>
-                <Col span="12">
-                <FormItem label="店长组别:" prop="teamname">
-                    <input style="width: 300px" v-model="showEditForm.teamname" disabled />
-                </FormItem>
-                </Col>
-            </Row>
-            <Row>
-                <Col span="12">
-                <FormItem label="处理方案:" prop="deal">
-                    <Input placeholder="请输入处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" v-model="showEditForm.deal" disabled />
+                <FormItem label="客诉点总结:" prop="summary">
+                    <Input placeholder="请输入客诉点总结" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" v-model="showEditForm.summary" />
                 </FormItem>
                 </Col>
                 <Col span="12">
@@ -191,8 +188,15 @@
             </Row>
             <Row>
                 <Col span="12">
-                <FormItem label="签单日期" prop="serverdeadline">
-                    <DatePicker type="datetime" format="yyyy-MM-dd " v-model="showEditForm.serverdeadline" disabled placeholder="Select date and time(Excluding seconds)" style="width: 300px"></DatePicker>
+                <FormItem label="判责结果:" prop="result">
+                    <select placeholder="判责结果:" style="width: 300px;height:35px" v-model="showEditForm.result">
+                        <option value="0">微责</option>
+                        <option value="1">无责</option>
+                        <option value="2">重责</option>
+                        <option value="3">轻责</option>
+                        <option value="4">中责</option>
+                        <option value="5">待定</option>
+                    </select>
                 </FormItem>
                 </Col>
                 <Col span="12">
@@ -505,11 +509,11 @@
                 </Select>
             </FormItem>
             <FormItem label="客诉小类别" prop="complaintName" v-if="showEditForm.level != null">
-                <Select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width: 200px">
-                    <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+                <select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width: 200px">
+                    <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                         {{complaintNameId.complaintName}}
-                    </Option>
-                </Select>
+                    </option>
+                </select>
             </FormItem>
             <FormItem label="外因" prop="externalCause" v-if="showEditForm.externalCause != null">
                 <Input v-model="showEditForm.externalCause" style="width:400px" type="textarea" />
@@ -640,8 +644,6 @@ export default {
     data() {
         return {
             params: {
-                pageNum: 1,
-                pageSize: 3,
                 keyword: '',
                 wangwangnum: '',
                 PersonnelID: -1,
@@ -656,35 +658,42 @@ export default {
             },
             params1: {
                 level: 0,
+                parentId:0,
             },
+            ajaxHistoryDatas:[],
+            historyDatas:[],
+            totalCount: 0,
+            pageSize: 10,
             columns1: [{
                     title: '客诉类别',
                     align: 'center',
-                    render: (h, params) => {
-                        const row = params.row;
-                        const color = row.level == 1 ? 'green' : (row.level == 2 ? 'red' : (row.level == 3 ? 'blue' : (row.level == 4 ? 'purple' : (row.level == 5 ? 'pink' : (row.level == 6 ? 'orange' : (row.level == 7 ? 'bronze' : (row.level == 8 ? 'green' : (row.level == 9 ? 'red' : (row.level == 10 ? 'blue' : 'red')))))))));
-                        const text = row.level == 1 ? '直通车不专业' : (row.level == 2 ? '作图' : (row.level == 3 ? '服务不专业 ' : (row.level == 4 ? '服务态度不好' : (row.level == 5 ? '店长进度慢' : (row.level == 6 ? '店长沟通不好 ' : (row.level == 7 ? '服务流量' : (row.level == 8 ? '服务转化' : (row.level == 9 ? '店铺排名' : (row.level == 10 ? '直通车没人管' : '其它')))))))));
-                        return h('Tag', {
-                            props: {
-                                color: color
-                            }
-                        }, text);
-                    },
+                    // render: (h, params) => {
+                    //     const row = params.row;
+                    //     const color = row.level == 1 ? 'green' : (row.level == 2 ? 'red' : (row.level == 3 ? 'blue' : (row.level == 4 ? 'purple' : (row.level == 5 ? 'pink' : (row.level == 6 ? 'orange' : (row.level == 7 ? 'bronze' : (row.level == 8 ? 'green' : (row.level == 9 ? 'red' : (row.level == 10 ? 'blue' : 'red')))))))));
+                    //     const text = row.level == 1 ? '直通车不专业' : (row.level == 2 ? '作图' : (row.level == 3 ? '服务不专业 ' : (row.level == 4 ? '服务态度不好' : (row.level == 5 ? '店长进度慢' : (row.level == 6 ? '店长沟通不好 ' : (row.level == 7 ? '服务流量' : (row.level == 8 ? '服务转化' : (row.level == 9 ? '店铺排名' : (row.level == 10 ? '直通车没人管' : '其它')))))))));
+                    //     return h('Tag', {
+                    //         props: {
+                    //             color: color
+                    //         }
+                    //     }, text);
+                    // },
+                    key: 'parentName',
                     align: 'center'
                 },
                 {
                     title: '客诉小类别',
                     align: 'center',
-                    render: (h, params) => {
-                        const row = params.row;
-                        const color = row.sonLevel == 8 ? 'green' : (row.sonLevel == 9 ? 'red' : (row.sonLevel == 10 ? 'blue' : (row.sonLevel == 11 ? 'purple' : (row.sonLevel == 12 ? 'pink' : (row.sonLevel == 13 ? 'orange' : (row.sonLevel == 14 ? 'bronze' : (row.sonLevel == 15 ? 'green' : (row.sonLevel == 16 ? 'red' : (row.sonLevel == 17 ? 'orange' : (row.sonLevel == 18 ? 'bronze' : (row.sonLevel == 19 ? 'green' : (row.sonLevel == 20 ? 'red' : (row.sonLevel == 21 ? 'orange' : (row.sonLevel == 22 ? 'bronze' : (row.sonLevel == 23 ? 'green' : (row.sonLevel == 24 ? 'red' : (row.sonLevel == 25 ? 'orange' : (row.sonLevel == 26 ? 'bronze' : (row.sonLevel == 27 ? 'green' : (row.sonLevel == 28 ? 'red' : (row.sonLevel == 29 ? 'orange' : (row.sonLevel == 30 ? 'bronze' : (row.sonLevel == 31 ? 'green' : (row.sonLevel == 32 ? 'red' : (row.sonLevel == 33 ? 'blue' : 'red')))))))))))))))))))))))));
-                        const text = row.sonLevel == 8 ? '投产低' : (row.sonLevel == 9 ? '没效果' : (row.sonLevel == 10 ? '没人管 ' : (row.sonLevel == 11 ? '不专业' : (row.sonLevel == 12 ? '进度慢' : (row.sonLevel == 13 ? '只会开车 ' : (row.sonLevel == 14 ? '只会刷单' : (row.sonLevel == 15 ? '方案无实际意义' : (row.sonLevel == 16 ? '不主动' : (row.sonLevel == 17 ? '不积极 ' : (row.sonLevel == 18 ? '不用心' : (row.sonLevel == 19 ? '不负责' : (row.sonLevel == 20 ? '不回复 ' : (row.sonLevel == 21 ? '不告知' : (row.sonLevel == 22 ? '做事拖拉' : (row.sonLevel == 23 ? '不及时反馈' : (row.sonLevel == 24 ? '表达不清晰 ' : (row.sonLevel == 25 ? '理解能力差' : (row.sonLevel == 26 ? '沟通不愉悦' : (row.sonLevel == 27 ? '无流量 ' : (row.sonLevel == 28 ? '流量下降' : (row.sonLevel == 29 ? '未达预期' : (row.sonLevel == 30 ? '无转化' : (row.sonLevel == 31 ? '转化下降 ' : (row.sonLevel == 32 ? '未达到预期' : (row.sonLevel == 33 ? '店铺排名下降' : '其它')))))))))))))))))))))))));
-                        return h('Tag', {
-                            props: {
-                                color: color
-                            }
-                        }, text);
-                    },
+                    // render: (h, params) => {
+                    //     const row = params.row;
+                    //     const color = row.sonLevel == 8 ? 'green' : (row.sonLevel == 9 ? 'red' : (row.sonLevel == 10 ? 'blue' : (row.sonLevel == 11 ? 'purple' : (row.sonLevel == 12 ? 'pink' : (row.sonLevel == 13 ? 'orange' : (row.sonLevel == 14 ? 'bronze' : (row.sonLevel == 15 ? 'green' : (row.sonLevel == 16 ? 'red' : (row.sonLevel == 17 ? 'orange' : (row.sonLevel == 18 ? 'bronze' : (row.sonLevel == 19 ? 'green' : (row.sonLevel == 20 ? 'red' : (row.sonLevel == 21 ? 'orange' : (row.sonLevel == 22 ? 'bronze' : (row.sonLevel == 23 ? 'green' : (row.sonLevel == 24 ? 'red' : (row.sonLevel == 25 ? 'orange' : (row.sonLevel == 26 ? 'bronze' : (row.sonLevel == 27 ? 'green' : (row.sonLevel == 28 ? 'red' : (row.sonLevel == 29 ? 'orange' : (row.sonLevel == 30 ? 'bronze' : (row.sonLevel == 31 ? 'green' : (row.sonLevel == 32 ? 'red' : (row.sonLevel == 33 ? 'blue' : 'red')))))))))))))))))))))))));
+                    //     const text = row.sonLevel == 8 ? '投产低' : (row.sonLevel == 9 ? '没效果' : (row.sonLevel == 10 ? '没人管 ' : (row.sonLevel == 11 ? '不专业' : (row.sonLevel == 12 ? '进度慢' : (row.sonLevel == 13 ? '只会开车 ' : (row.sonLevel == 14 ? '只会刷单' : (row.sonLevel == 15 ? '方案无实际意义' : (row.sonLevel == 16 ? '不主动' : (row.sonLevel == 17 ? '不积极 ' : (row.sonLevel == 18 ? '不用心' : (row.sonLevel == 19 ? '不负责' : (row.sonLevel == 20 ? '不回复 ' : (row.sonLevel == 21 ? '不告知' : (row.sonLevel == 22 ? '做事拖拉' : (row.sonLevel == 23 ? '不及时反馈' : (row.sonLevel == 24 ? '表达不清晰 ' : (row.sonLevel == 25 ? '理解能力差' : (row.sonLevel == 26 ? '沟通不愉悦' : (row.sonLevel == 27 ? '无流量 ' : (row.sonLevel == 28 ? '流量下降' : (row.sonLevel == 29 ? '未达预期' : (row.sonLevel == 30 ? '无转化' : (row.sonLevel == 31 ? '转化下降 ' : (row.sonLevel == 32 ? '未达到预期' : (row.sonLevel == 33 ? '店铺排名下降' : '其它')))))))))))))))))))))))));
+                    //     return h('Tag', {
+                    //         props: {
+                    //             color: color
+                    //         }
+                    //     }, text);
+                    // },
+                    key : 'complaintName',
                     align: 'center'
                 },
                 {
@@ -999,7 +1008,7 @@ export default {
                 //     url: '***************',
                 // },
             ],
-            data2:[],
+            data2: [],
             url: null,
             name: null,
             pkIds: 0,
@@ -1015,7 +1024,7 @@ export default {
             showAddModal: false,
             detailsModal: false,
             showEditModalAll: false,
-            showModal:false,
+            showModal: false,
             //点击投诉详情
             complaintIds: {
                 pkId: '',
@@ -1147,6 +1156,14 @@ export default {
                     this.data1 = data.data.list;
                     this.totalCount = data.data.total;
                     this.length = data.data.list.length;
+                    //新增分页
+                    this.ajaxHistoryDatas = data.data.list;
+                    this.totalCount = data.data.total;
+                    if(this.ajaxHistoryDatas<this.pageSize){
+                        this.historyDatas = this.ajaxHistoryDatas;
+                    }else{
+                        this.historyDatas = this.ajaxHistoryDatas.slice(0,this.pageSize);
+                    }
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -1202,17 +1219,10 @@ export default {
             this.size = data.length;
             this.selection = data;
         },
-        pageChange(num) {
-            this.params.pageNum = num;
-            console.log("num"+num);
-            this.pageNumber = num;
-            console.log(this.pageNumber);
-            this.init();
-        },
-        sizeChange(size) {
-            this.params.pageSize = size;
-            console.log(size);
-            this.init();
+        pageChange(index){
+            var _start = (index-1)*this.pageSize;
+            var _end = index*this.pageSize;
+            this.historyDatas = this.ajaxHistoryDatas.slice(_start,_end);
         },
         //点击修改
         showEditModalData(params) {
@@ -1227,19 +1237,32 @@ export default {
             }) => {
                 if (data && data.code == 0) {
                     this.levels = data.data;
-                    console.log("大类");
-                    console.log(this.levels);
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             });
+            this.params1.parentId = params.row.level;
+             //小类
+            API.complaintList.getLevelName(this.params1).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levelNames = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('当前没有判责');
+            });
             if (typeof params.row != 'undefined') {
                 const responsibilityList = params.row;
                 this.showEditForm.pkId = responsibilityList.pkId;
                 this.showEditForm.level = responsibilityList.level;
+                console.log(this.showEditForm.level);
                 this.showEditForm.sonLevel = responsibilityList.sonLevel;
+                console.log(this.showEditForm.sonLevel);
                 this.showEditForm.result = responsibilityList.result;
                 this.showEditForm.responsibilityer = responsibilityList.responsibilityer;
                 this.showEditForm.grade = responsibilityList.grade;
@@ -1285,7 +1308,7 @@ export default {
         //取消修改
         cancelEdit() {
             this.showEditModal = false;
-             this.showEditModalAll = false;
+            this.showEditModalAll = false;
         },
         //点击删除
         delete(params) {
@@ -1299,7 +1322,7 @@ export default {
         },
         //点击判责
         reViewEditModalData(params) {
-           this.showModal = true;
+            this.showModal = true;
             this.params.wangwangnum = params.row.wangwangnum;
             this.params.pageNum = 1;
             // 数据初始化
@@ -1416,10 +1439,10 @@ export default {
             });
             this.loading = false;
         },
-        saveFileTable(){
+        saveFileTable() {
             this.showModal = false;
         },
-        cancelFileTable(){
+        cancelFileTable() {
             this.showModal = false;
         },
         //点击删除指定的判责依据
@@ -1604,9 +1627,38 @@ export default {
                 desc: 'File format of ' + file.name + ' is incorrect, please select jpg or png.'
             });
         },
-         //点击详情
+        //点击详情
         showData(params) {
             this.showEditModalAll = true;
+            this.params1.parentId = params.row.level;
+            this.params.complaintId = params.row.pkId;
+            this.showEditForm.type = params.row.type;
+            let complaintId = this.params.complaintId;
+            this.showEditForm.complaintId = complaintId;
+            //大类
+            API.complaintList.selectLevel(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levels = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
+             //小类
+            API.complaintList.getLevelName(this.params1).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levelNames = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('当前没有判责');
+            });
             if (typeof params.row != 'undefined') {
                 const Complaint = params.row;
                 this.showEditForm.pkId = Complaint.pkId;

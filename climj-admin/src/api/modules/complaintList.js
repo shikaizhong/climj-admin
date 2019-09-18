@@ -75,7 +75,7 @@ export function upload(params){
     data: requestParam(params, 'post', true, 'json')
   })
 }
- //通过wangwangNum查询历史记录
+ //级联查询
  export function getLevelName(params) {
   return request({
     method: 'post',

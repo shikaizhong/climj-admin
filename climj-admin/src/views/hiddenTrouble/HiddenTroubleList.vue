@@ -60,14 +60,14 @@
 
     <!-- 主页面的表格 -->
     <Row style="margin-top: 25px">
-        <Table border ref="selection" :columns="columns1" :current="params.pageNum" :data="data1" width=100%>
+        <Table border ref="selection" :columns="columns1" :current="params.pageNum" :data="historyDatas" width=100%>
         </Table>
     </Row>
 
     <!-- 分页 -->
     <Row>
         <div style="float:right">
-            <Page :total="totalCount" :page-size="params.pageSize" loading @on-change="pageChange" @on-page-size-change="sizeChange" />
+            <Page :total="totalCount" :page-size="pageSize" loading @on-change="pageChange" />
         </div>
     </Row>
 
@@ -377,8 +377,6 @@ export default {
     data() {
         return {
             params: {
-                pageNum: 1,
-                pageSize: 10,
                 wangwangnum: '',
                 shopptype: '',
                 username1: '',
@@ -395,7 +393,10 @@ export default {
             params1: {
                 level: 0,
             },
+            ajaxHistoryDatas:[],
+            historyDatas:[],
             totalCount: 0,
+            pageSize: 10,
             showAddModal: false, //不显示
             loading: false,
             //添加按钮刚开始不显示
@@ -844,6 +845,14 @@ export default {
                     // for(var i = 0;i<this.length;i++){
                     //     this.pkIds.push(data.data.list[i].pkIds);
                     // }
+                     //新增分页
+                    this.ajaxHistoryDatas = data.data.list;
+                    this.totalCount = data.data.total;
+                    if(this.ajaxHistoryDatas<this.pageSize){
+                        this.historyDatas = this.ajaxHistoryDatas;
+                    }else{
+                        this.historyDatas = this.ajaxHistoryDatas.slice(0,this.pageSize);
+                    }
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -866,15 +875,10 @@ export default {
             this.loading = false;
         },
 
-        pageChange(num) {
-            this.params.pageNum = num;
-            this.pageNumber = num;
-            this.init();
-        },
-
-        sizeChange(size) {
-            this.params.pageSize = size;
-            this.init();
+        pageChange(index){
+            var _start = (index-1)*this.pageSize;
+            var _end = index*this.pageSize;
+            this.historyDatas = this.ajaxHistoryDatas.slice(_start,_end);
         },
 
         /* 删除模块，弹出弹框*/
@@ -885,8 +889,6 @@ export default {
             let pkIds = this.pkIds;
             if (typeof params.row != 'undefined') {
                 pkIds.push(params.row.pkId);
-                // console.log("循环啊");
-                // console.log(pkIds);
             } else {
                 this.selection.forEach(v => {
                     pkIds.push(v.pkId)
@@ -936,7 +938,6 @@ export default {
             }) => {
                 if (data && data.code == 0) {
                     this.data2 = data.data;
-                    console.log(data);
                     this.params.wangwangnum = '';
                 } else {
                     this.$Message.error(data.msg);
@@ -1010,12 +1011,24 @@ export default {
             }) => {
                 if (data && data.code == 0) {
                     this.levels = data.data;
-                    console.log(this.levels);
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
+            });
+            this.params1.parentId = params.row.level;
+             //小类
+            API.complaintList.getLevelName(this.params1).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levelNames = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('当前没有判责');
             });
             if (typeof params.row != 'undefined') {
                 const HiddenTrouble = params.row;
@@ -1045,7 +1058,7 @@ export default {
         selectLevel(params) {
             this.params1.parentId = this.modifierForm.level;
             this.modifierForm.parentId = this.params1.parentId;
-            this.modifierForm.pkId = this.modifierForm.sonLevel;
+            this.modifierForm.sonLevel = this.modifierForm.sonLevel;
             //小类
             API.complaintList.getLevelName(this.params1).then(({
                 data
@@ -1078,6 +1091,33 @@ export default {
         //详情
         detailsModalDate(params) {
             this.detailsModal = true;
+              this.modifierForm.complaintId = params.row.pkId;
+            this.modifierForm.pkId = params.row.pkId;
+            //大类
+            API.complaintList.selectLevel(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levels = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
+            this.params1.parentId = params.row.level;
+             //小类
+            API.complaintList.getLevelName(this.params1).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levelNames = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('当前没有判责');
+            });
             if (typeof params.row != 'undefined') {
                 const HiddenTrouble = params.row;
                 this.modifierForm.pkId = HiddenTrouble.pkId;
@@ -1104,17 +1144,14 @@ export default {
                 this.modifierForm.sonLevel = HiddenTrouble.sonLevel;
                 this.modifierForm.externalCause = HiddenTrouble.externalCause;
                 this.modifierForm.parentId = HiddenTrouble.parentId;
-
                 this.modifierForm.complaintdate = HiddenTrouble.complaintdate;
                 this.modifierForm.username = HiddenTrouble.username;
                 this.modifierForm.channel = HiddenTrouble.channel;
                 this.modifierForm.tename = HiddenTrouble.tename;
-                console.log("店长为:" + HiddenTrouble.tename);
                 this.modifierForm.turnover = HiddenTrouble.turnover;
                 this.modifierForm.number = HiddenTrouble.number;
                 this.modifierForm.industry = HiddenTrouble.industry;
                 this.modifierForm.followPersonel = HiddenTrouble.followPersonel;
-                console.log(this.modifierForm.followPersonel + "跟进人员为");
                 this.modifierForm.processingScheme = HiddenTrouble.processingScheme;
                 this.modifierForm.followProcess = HiddenTrouble.followProcess;
                 this.modifierForm.content = HiddenTrouble.content;
@@ -1211,7 +1248,6 @@ export default {
         //删除文件
         deleteList(showFileForm) {
             this.showFileForm.pkId = showFileForm.row.pkId;
-            // console.log("pkId为：" + this.showFileForm.pkId);
             this.showDeleteFileModal = true;
         },
 

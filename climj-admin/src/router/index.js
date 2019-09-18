@@ -7,12 +7,13 @@ import Role from '@/views/role/Role';
 import Menu from '@/views/menus/Menu';
 //import HelloWorld from '@/components/HelloWorld';
 import Druid from '@/views/druid/Druid';
+import HiddenTroubleList from '@/views/hiddenTrouble/HiddenTroubleList';
 import ComplaintList from '@/views/complaint/ComplaintList';
 import ResponsibilityList from '@/views/responsibility/ResponsibilityList';
 import RefundList from '@/views/refund/RefundList';
-import HiddenTroubleList from '@/views/hiddenTrouble/HiddenTroubleList';
+//echart表格
+// import EchartTest from '@/views/echart/EchartTest';
 Vue.use(Router)
- 
 export default new Router({
   //打包要把它注释掉
   mode:'history',
@@ -28,11 +29,13 @@ export default new Router({
         {path: '/role', component: Role},
         {path: '/menu', component: Menu},
         {path: '/druid', component: Druid},
+        {path: '/hiddenTroubleList', component:HiddenTroubleList},
         {path:'/complaintList',component:ComplaintList},
         {path: '/responsibilityList',component:ResponsibilityList},
         {path:'/refundList',component:RefundList},
-        {path: '/hiddenTroubleList', component:HiddenTroubleList},
-      ]
+        //echart表格
+        // {path:'/echartTest',component:EchartTest},
+      ]  
     }
   ]
 })

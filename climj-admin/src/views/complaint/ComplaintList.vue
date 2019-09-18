@@ -83,7 +83,7 @@
         </Col>
     </Row>
     <Row style="margin-top: 25px">
-        <Table border ref="selection" :columns="columns1" :current="params.pageNum" @on-selection-change="selectionChange" :data="data1" width=100%>
+        <Table border ref="selection" :columns="columns1" :current="params.pageNum" @on-selection-change="selectionChange" :data="historyDatas" width=100%>
         </Table>
     </Row>
     <Row>
@@ -94,7 +94,7 @@
 
     <Row>
         <div style="float:right">
-            <Page :total="totalCount" :page-size="params.pagesize" loading show-sizer @on-change="pageChange" @on-page-size-change="sizeChange" />
+            <Page :total="totalCount" :page-size="pageSize" loading  @on-change="pageChange" />
         </div>
     </Row>
     <!-- 添加 -->
@@ -478,11 +478,11 @@
                 </Select>
             </FormItem>
             <FormItem label="客诉小类别" prop="complaintName" v-if="showEditForm.level != null">
-                <Select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px">
-                    <Option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
+                <select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px">
+                    <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                         {{complaintNameId.complaintName}}
-                    </Option>
-                </Select>
+                    </option>
+                </select>
             </FormItem>
             <FormItem label="原因" prop="content" v-if="showEditForm.content != null">
                 <Input v-model="showEditForm.content" disabled placeholder="请输入投诉内容" type="textarea" style="width:400px" />
@@ -498,7 +498,7 @@
             </FormItem>
         </Form>
     </Modal>
-
+    <!-- 点击修改 -->
     <Modal v-model="showEditModal" @on-ok="saveEdit" @on-cancel="cancelEdit" width="800" draggable scrollable>
         <h3 slot="header" style="color:#2D8CF0">修改信息</h3>
         <Form :model="showEditForm" label-position="right" :label-width="100" @submit.native.prevent="saveEditUser">
@@ -571,6 +571,26 @@
                 </Col>
             </Row>
             <Row>
+                <Col span="12">
+                <FormItem label="招商顾问" prop="username">
+                    <Select v-model="showEditForm.personnelid" placeholder="无招商顾问" disabled>
+                        <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
+                            {{personnelId.username}}
+                        </Option>
+                    </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="跟进人员" prop="followPersonel">
+                    <Select v-model="showEditForm.followPersonel" placeholder="无责任人" style="width: 300px" disabled>
+                        <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
+                            {{personnelId.username}}
+                        </Option>
+                    </Select>
+                </FormItem>
+                </Col>
+            </Row>
+            <Row>
                 <!-- <Col span="12">
          <FormItem label="车手" prop="username">
           <Select v-model="showEditForm.technologyRecruitmentid" placeholder="无车手">
@@ -592,6 +612,30 @@
                 </Col>
             </Row>
             <Row>
+                <Col span="12">
+                <FormItem label="处理方案" prop="processingScheme">
+                    <Input v-model="showEditForm.processingScheme" placeholder="处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble" />
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="跟进过程" prop="followProcess">
+                    <Input v-model="showEditForm.followProcess" placeholder="跟进过程" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble" />
+                </FormItem>
+                </Col>
+            </Row>
+            <Row>
+                <Col span="12">
+                <FormItem label="判责结果" prop="result" v-if="showEditForm.result != null">
+                    <select v-model="showEditForm.result" disabled placeholder="暂未判责" filterable style="width:180px">
+                        <option value="0">微责</option>
+                        <option value="1">无责</option>
+                        <option value="2">重责</option>
+                        <option value="3">轻责</option>
+                        <option value="4">中责</option>
+                        <option value="5">待定</option>
+                    </select>
+                </FormItem>
+                </Col>
                 <Col span="12">
                 <FormItem label="店铺行业" prop="industry">
                     <select v-model="showEditForm.industry" style="width: 280px;height:35px" placeholder="请选择投诉渠道" clearable filterable>
@@ -636,50 +680,6 @@
                     </select>
                 </FormItem>
                 </Col>
-                <Col span="12">
-                <FormItem label="跟进人员" prop="followPersonel">
-                    <Select v-model="showEditForm.followPersonel" placeholder="无责任人" style="width: 300px">
-                        <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
-                            {{personnelId.username}}
-                        </Option>
-                    </Select>
-                </FormItem>
-                </Col>
-            </Row>
-            <Row>
-                <Col span="12">
-                <FormItem label="处理方案" prop="processingScheme">
-                    <Input v-model="showEditForm.processingScheme" placeholder="处理方案" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble" />
-                </FormItem>
-                </Col>
-                <Col span="12">
-                <FormItem label="跟进过程" prop="followProcess">
-                    <Input v-model="showEditForm.followProcess" placeholder="跟进过程" type="textarea" :autosize="{minRows: 5,maxRows: 5}" style="width: 300px" :clearable="isClearAble" />
-                </FormItem>
-                </Col>
-            </Row>
-            <Row>
-                <Col span="12">
-                <FormItem label="判责结果" prop="result" v-if="showEditForm.result != null">
-                    <select v-model="showEditForm.result" disabled placeholder="暂未判责" filterable style="width:180px">
-                        <option value="0">微责</option>
-                        <option value="1">无责</option>
-                        <option value="2">重责</option>
-                        <option value="3">轻责</option>
-                        <option value="4">中责</option>
-                        <option value="5">待定</option>
-                    </select>
-                </FormItem>
-                </Col>
-                <Col span="12">
-                <FormItem label="招商顾问" prop="username">
-                    <Select v-model="showEditForm.personnelid" placeholder="无招商顾问" disabled>
-                        <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
-                            {{personnelId.username}}
-                        </Option>
-                    </Select>
-                </FormItem>
-                </Col>
             </Row>
             <Row>
                 <Col span="12">
@@ -693,16 +693,18 @@
                     <Input v-model="showEditForm.remark" placeholder="请输入投诉备注" type="textarea" :autosize="{minRows: 5,maxRows: 5}" :clearable="isClearAble" />
                 </FormItem>
             </Row>
-            <FormItem label="客诉大类别" prop="parentName">
-                <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 180px">
-                    <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
-                        {{levelId.parentName}}
-                    </Option>
-                </Select>
-            </FormItem>
             <Row>
                 <Col span="12">
-                <FormItem label="客诉小类别" prop="complaintName">
+                <FormItem label="客诉大类别" prop="parentName" v-if="showEditForm.level">
+                    <Select @on-change="selectLevel" v-model="showEditForm.level" placeholder="Select your level" style="width: 180px">
+                        <Option v-for="levelId in levels" :label="levelId.parentName" :value="levelId.parentId" :key="levelId.parentId">
+                            {{levelId.parentName}}
+                        </Option>
+                    </Select>
+                </FormItem>
+                </Col>
+                <Col span="12">
+                <FormItem label="客诉小类别" prop="complaintName" v-if="showEditForm.sonLevel">
                     <select v-model="showEditForm.sonLevel" placeholder="Select your pkId" style="width: 180px">
                         <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                             {{complaintNameId.complaintName}}
@@ -712,7 +714,7 @@
                 </Col>
             </Row>
             <!-- <FormItem label="场景还原地址" prop="scenerestoration">
-          <ul style="list-style:none">
+        <ul style="list-style:none">
             <li v-for="(item,index) in url" class="forteItem" :key="index"> -->
             <!-- <a :href="showEditForm.scenerestoration" target="_Blank">{{showEditForm.scenerestoration}}</a> -->
             <!-- <a :href="item" target="_Blank">{{item}}</a>
@@ -819,8 +821,6 @@ export default {
     data() {
         return {
             params: {
-                pageNum: 1,
-                pagesize: 10,
                 keyword: '',
                 result: -1,
                 dateTime: '',
@@ -843,7 +843,10 @@ export default {
             showAddModal: false,
             //确定添加
             confirmModal: false,
+            ajaxHistoryDatas:[],
+            historyDatas:[],
             totalCount: 0,
+            pageSize: 10,
             tscustomer: [],
             complaintids: [],
             teamNameIds: [],
@@ -1317,6 +1320,14 @@ export default {
                     this.data1 = data.data.list;
                     this.totalCount = data.data.total;
                     this.length = data.data.list.length;
+
+                    this.ajaxHistoryDatas = data.data.list;
+                    this.totalCount = data.data.total;
+                    if(this.ajaxHistoryDatas<this.pageSize){
+                        this.historyDatas = this.ajaxHistoryDatas;
+                    }else{
+                        this.historyDatas = this.ajaxHistoryDatas.slice(0,this.pageSize);
+                    }
                     for (var i = 0; i < this.length; i++) {
                         // this.complaintId.push(data.data.list[i].pkId);
                         // console.log("id00000000000"+complaintId);
@@ -1356,6 +1367,13 @@ export default {
                 this.$Message.error('连接失败，请检查网络！');
             });
             this.loading = false;
+        },
+
+        pageChange(index){
+            // console.log("12121212121212");
+            var _start = (index-1)*this.pageSize;
+            var _end = index*this.pageSize;
+            this.historyDatas = this.ajaxHistoryDatas.slice(_start,_end);
         },
         // second:function(){
         //   // this.loading = true;
@@ -1415,15 +1433,6 @@ export default {
         // selectName(){
         //   this
         // },
-        pageChange(num) {
-            this.params.pageNum = num;
-            this.pageNumber = num;
-            this.init();
-        },
-        sizeChange(size) {
-            this.params.pagesize = size;
-            this.init();
-        },
         resetData(val) {
             if (!val) {
                 this.showEditForm = {
@@ -1674,13 +1683,24 @@ export default {
             }) => {
                 if (data && data.code == 0) {
                     this.levels = data.data;
-                    console.log("大类");
-                    console.log(this.levels);
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
+            });
+            this.params1.parentId = params.row.level;
+             //小类
+            API.complaintList.getLevelName(this.params1).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.levelNames = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('当前没有判责');
             });
             /*遍历用户名*/
             API.complaintList.complaintNames(this.params).then(({
@@ -1701,6 +1721,7 @@ export default {
             if (typeof params.row != 'undefined') {
                 const Complaint = params.row;
                 this.showEditForm.pkId = Complaint.pkId;
+                console.log(this.showEditForm.pkId+"主键id为:")
                 this.showEditForm.wangwangnum = Complaint.wangwangnum;
                 this.showEditForm.channel = Complaint.channel;
                 //数组转取出情景还原url
@@ -1713,6 +1734,9 @@ export default {
                 this.showEditForm.responsibility = Complaint.responsibility;
                 this.showEditForm.frequency = Complaint.frequency;
                 this.showEditForm.level = Complaint.level;
+                console.log("大类别为:"+Complaint.level);
+                this.showEditForm.sonLevel = Complaint.sonLevel;
+                console.log("小类别为:"+Complaint.sonLevel);
                 this.showEditForm.result = Complaint.result;
                 this.showEditForm.teamname = Complaint.teamname;
                 this.showEditForm.username = Complaint.username;
@@ -1895,7 +1919,7 @@ export default {
         selectLevel(params) {
             this.params1.parentId = this.showEditForm.level;
             this.showEditForm.parentId = this.params1.parentId;
-            this.showEditForm.pkId = this.showEditForm.sonLevel;
+            this.showEditForm.sonLevel = this.showEditForm.sonLevel;
             //小类
             API.complaintList.getLevelName(this.params1).then(({
                 data
