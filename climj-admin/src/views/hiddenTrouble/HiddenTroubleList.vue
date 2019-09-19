@@ -22,7 +22,7 @@
 
         <!-- 日期查询 -->
         <Col span="4" push=1>
-        <Date-picker type="datetimerange" v-model="params.dateTime" format="yyyy-MM-dd HH:mm" @on-change="search" placeholder="选择日期和时间" style="width: 300px"></Date-picker>
+        <Date-picker type="datetimerange" v-model="params.dateTime" format="yyyy-MM-dd HH:mm" @on-change="init" placeholder="选择日期和时间" style="width: 300px"></Date-picker>
         </Col>
 
         <!-- <Col>
@@ -33,24 +33,24 @@
 
         <!-- 查询 -->
         <Col span="4" push=2>
-        <Input v-model="params.wangwangnum" style="width:200px" @on-change="search" placeholder="请输入客户名" clearable />
+        <Input v-model="params.wangwangnum" style="width:200px" @on-change="init" placeholder="请输入客户名" clearable />
         </Col>
         <Col span="4" push=2>
-        <Input v-model="params.shopptype" style="width:200px" @on-change="search" placeholder="请输入店铺类型" clearable />
+        <Input v-model="params.shopptype" style="width:200px" @on-change="init" placeholder="请输入店铺类型" clearable />
         </Col>
     </Row>
     <Row style="margin-top:5px">
         <Col span="4" push=3>
-        <Input v-model="params.username1" style="width:200px" @on-change="search" placeholder="请输入店长" clearable />
+        <Input v-model="params.username1" style="width:200px" @on-change="init" placeholder="请输入店长" clearable />
         </Col>
         <Col span="4" push=3>
-        <Input v-model="params.username2" style="width:200px" @on-change="search" placeholder="请输入招商顾问" clearable />
+        <Input v-model="params.username2" style="width:200px" @on-change="init" placeholder="请输入招商顾问" clearable />
         </Col>
         <Col span="4" push=4>
-        <Input v-model="params.TeamName" style="width:200px" @on-change="search" placeholder="请输入团队" clearable />
+        <Input v-model="params.TeamName" style="width:200px" @on-change="init" placeholder="请输入团队" clearable />
         </Col>
         <Col span="4" push=4>
-        <Input v-model="params.frequency" style="width:200px" @on-change="search" placeholder="请输入隐患次数" clearable />
+        <Input v-model="params.frequency" style="width:200px" @click="init" placeholder="请输入隐患次数" clearable />
         </Col>
         <!-- 搜索按钮 -->
         <Col span="4" style="margin-left: 5px" push=3>
@@ -94,7 +94,7 @@
         </Form>
     </Modal>
     <!--添加提示-->
-    <Modal v-model="confirmModal" @on-ok="confirmAdd" @on-cancel="confirmCancel" draggable scrollable>
+    <Modal v-model="confirmModal" @on-ok="confirmAdd" @on-cancel="confirmCancel">
         <h2 style="color:red;text-align: center;font-size: 20px">请核实是否添加数据完毕</h2>
     </Modal>
     <!-- 修改隐患弹窗，点击修改按钮弹出 -->
@@ -149,7 +149,7 @@
             <Row>
                 <Col span="12">
                 <FormItem label="客诉小类别" prop="complaintName">
-                    <select v-model="modifierForm.sonLevel" placeholder="Select your pkId" style="width: 300px">
+                    <select v-model="modifierForm.sonLevel" placeholder="暂无小类别" style="width: 300px;height:30px">
                         <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                             {{complaintNameId.complaintName}}
                         </option>
@@ -176,10 +176,10 @@
         <h3 slot="header" style="color:#2D8CF0">详情</h3>
         <Form :model="modifierForm" label-position="right" :label-width="100" @submit.native.prevent="saveModifier" inline>
             <FormItem label="客户名" prop="wangwangnum" v-if="modifierForm.wangwangnum != null">
-                <Input disabled v-model="modifierForm.wangwangnum" style="width:180px"/>
+                <Input disabled v-model="modifierForm.wangwangnum" style="width:180px" />
             </FormItem>
-            <FormItem label="隐患次数" prop="frequency" v-if="modifierForm.frequency != null">
-                <Input disabled v-model="modifierForm.frequency" style="width:180px"/>
+            <FormItem label="次数" prop="frequency" v-if="modifierForm.frequency != null">
+                <Input disabled v-model="modifierForm.frequency" style="width:180px" />
             </FormItem>
             <FormItem label="客户类型" v-if="modifierForm.custtype != null">
                 <div style="width:180px">
@@ -199,9 +199,9 @@
             <FormItem label="退款金额" prop="refundAmount" v-if="modifierForm.refundAmount != null">
                 <Input disabled v-model="modifierForm.refundAmount" style="width:180px" />
             </FormItem>
-            
+
             <FormItem label="退款渠道" prop="refundChannel" v-if="modifierForm.refundChannel != null">
-                <select v-model="modifierForm.refundChannel" disabled style="width:180px">
+                <select v-model="modifierForm.refundChannel" disabled style="width:180px;height:30px">
                     <option value="1">SEM在线订购</option>
                     <option value="2">支付宝转账</option>
                     <option value="3">网银转账</option>
@@ -229,7 +229,7 @@
 
             <!-- 投诉管理 -->
             <FormItem label="投诉渠道" prop="channel" v-if="modifierForm.channel != null">
-                <select v-model="modifierForm.channel" disabled style="width:180px">
+                <select v-model="modifierForm.channel" disabled style="width:180px;height:30px">
                     <option value="1">招商京东</option>
                     <option value="2">招商淘宝</option>
                     <option value="3">综管部</option>
@@ -247,7 +247,7 @@
                 <Input v-model="modifierForm.number" disabled placeholder="店铺近30天成交笔数" style="width:180px" />
             </FormItem>
             <FormItem label="判责结果" prop="result" v-if="modifierForm.result != null">
-                <select v-model="modifierForm.result" disabled placeholder="选择状态" filterable style="width:180px">
+                <select v-model="modifierForm.result" disabled placeholder="选择状态" filterable style="width:180px;height:30px">
                     <option value="0">微责</option>
                     <option value="1">无责</option>
                     <option value="2">重责</option>
@@ -257,7 +257,7 @@
                 </select>
             </FormItem>
             <FormItem label="店铺行业" prop="industry" v-if="modifierForm.industry != null">
-                <select v-model="modifierForm.industry" disabled placeholder="请选择投诉渠道" clearable filterable style="width:180px">
+                <select v-model="modifierForm.industry" disabled placeholder="请选择投诉渠道" clearable filterable style="width:180px;height:30px">
                     <option value="1">3c数码配件</option>
                     <option value="2">MP3/MP4/ipod/录音笔</option>
                     <option value="3">ZIPPO/瑞士军刀/眼镜</option>
@@ -299,7 +299,7 @@
                 </select>
             </FormItem>
             <FormItem label="跟进人员" prop="followPersonel" v-if="modifierForm.followPersonel != null">
-                <select v-model="modifierForm.followPersonel" disabled placeholder="无责任人" style="width:180px">
+                <select v-model="modifierForm.followPersonel" disabled placeholder="无责任人" style="width:180px;height:30px">
                     <option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
                         {{personnelId.username}}
                     </option>
@@ -326,7 +326,7 @@
                 </Select>
             </FormItem>
             <FormItem label="客诉小类别" prop="complaintName" v-if="modifierForm.level != null">
-                <select v-model="modifierForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px">
+                <select v-model="modifierForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px;height:30px">
                     <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                         {{complaintNameId.complaintName}}
                     </option>
@@ -386,15 +386,14 @@ export default {
                 dateTime: '',
                 PersonnelID: -1,
                 TScustomer: '',
-                // startTime: '',
-                // endTime: '',
                 result: -1
             },
             params1: {
                 level: 0,
+                parentId: 0,
             },
-            ajaxHistoryDatas:[],
-            historyDatas:[],
+            ajaxHistoryDatas: [],
+            historyDatas: [],
             totalCount: 0,
             pageSize: 10,
             showAddModal: false, //不显示
@@ -845,13 +844,14 @@ export default {
                     // for(var i = 0;i<this.length;i++){
                     //     this.pkIds.push(data.data.list[i].pkIds);
                     // }
-                     //新增分页
+                    //新增分页
                     this.ajaxHistoryDatas = data.data.list;
                     this.totalCount = data.data.total;
-                    if(this.ajaxHistoryDatas<this.pageSize){
+                    console.log(this.ajaxHistoryDatas+"总数为");
+                    if (this.ajaxHistoryDatas < this.pageSize) {
                         this.historyDatas = this.ajaxHistoryDatas;
-                    }else{
-                        this.historyDatas = this.ajaxHistoryDatas.slice(0,this.pageSize);
+                    } else {
+                        this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
                     }
                 } else {
                     this.$Message.error(data.msg);
@@ -872,13 +872,25 @@ export default {
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             });
+             //大类
+                API.complaintList.selectLevel(this.params).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.levels = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                });
             this.loading = false;
         },
 
-        pageChange(index){
-            var _start = (index-1)*this.pageSize;
-            var _end = index*this.pageSize;
-            this.historyDatas = this.ajaxHistoryDatas.slice(_start,_end);
+        pageChange(index) {
+            var _start = (index - 1) * this.pageSize;
+            var _end = index * this.pageSize;
+            this.historyDatas = this.ajaxHistoryDatas.slice(_start, _end);
         },
 
         /* 删除模块，弹出弹框*/
@@ -1005,31 +1017,34 @@ export default {
             this.modifierModal = true;
             this.showFileForm.complaintId = params.row.pkId;
             this.showFileForm.pkId = params.row.pkId;
-            //大类
-            API.complaintList.selectLevel(this.params).then(({
-                data
-            }) => {
-                if (data && data.code == 0) {
-                    this.levels = data.data;
-                } else {
-                    this.$Message.error(data.msg);
-                }
-            }).catch((data) => {
-                this.$Message.error('连接失败，请检查网络！');
-            });
-            this.params1.parentId = params.row.level;
-             //小类
-            API.complaintList.getLevelName(this.params1).then(({
-                data
-            }) => {
-                if (data && data.code == 0) {
-                    this.levelNames = data.data;
-                } else {
-                    this.$Message.error(data.msg);
-                }
-            }).catch((data) => {
-                this.$Message.error('当前没有判责');
-            });
+            console.log(params.row.sonLevel+"当前行level");
+            if (params.row.level != null) {
+                //大类
+                API.complaintList.selectLevel(this.params).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.levels = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                });
+                this.params1.parentId = params.row.level;
+                //小类
+                API.complaintList.getLevelName(this.params1).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.levelNames = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('当前没有判责');
+                });
+            }
             if (typeof params.row != 'undefined') {
                 const HiddenTrouble = params.row;
                 this.modifierForm.pkId = HiddenTrouble.pkId;
@@ -1055,22 +1070,23 @@ export default {
         },
 
         //点击客诉大类别
-        selectLevel(params) {
-            this.params1.parentId = this.modifierForm.level;
-            this.modifierForm.parentId = this.params1.parentId;
-            this.modifierForm.sonLevel = this.modifierForm.sonLevel;
+        selectLevel() {
+            this.modifierForm.parentId = this.modifierForm.level;
+            this.params1.parentId = this.modifierForm.parentId;
             //小类
+            if(this.params1.parentId !=null){
             API.complaintList.getLevelName(this.params1).then(({
                 data
             }) => {
                 if (data && data.code == 0) {
-                    this.levelNames = data.data.list;
+                    this.levelNames = data.data;
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('当前没有判责');
             });
+            }
         },
 
         //详情，调用接口
@@ -1087,12 +1103,13 @@ export default {
                 this.$Message.error("链接失败，请检查网络！");
             })
         },
-        
+
         //详情
         detailsModalDate(params) {
             this.detailsModal = true;
-              this.modifierForm.complaintId = params.row.pkId;
+            this.modifierForm.complaintId = params.row.pkId;
             this.modifierForm.pkId = params.row.pkId;
+            if(params.row.level != null){
             //大类
             API.complaintList.selectLevel(this.params).then(({
                 data
@@ -1106,7 +1123,7 @@ export default {
                 this.$Message.error('连接失败，请检查网络！');
             });
             this.params1.parentId = params.row.level;
-             //小类
+            //小类
             API.complaintList.getLevelName(this.params1).then(({
                 data
             }) => {
@@ -1118,6 +1135,7 @@ export default {
             }).catch((data) => {
                 this.$Message.error('当前没有判责');
             });
+            }
             if (typeof params.row != 'undefined') {
                 const HiddenTrouble = params.row;
                 this.modifierForm.pkId = HiddenTrouble.pkId;

@@ -108,10 +108,28 @@
         </Form>
     </Modal>
     <!--添加提示-->
-    <Modal v-model="confirmModal" @on-ok="confirmAdd" @on-cancel="confirmCancel" draggable scrollable>
-        <h2 style="color:red;text-align: center;font-size: 20px">请核实是否添加数据完毕</h2>
+    <Modal v-model="confirmModal" width="360">
+        <p slot="header" style="color:#f60;text-align:center">
+            <Icon type="ios-information-circle"></Icon>
+            <span v-show="this.a != 0">您输入的信息有误</span>
+            <span v-show="this.a == 0">您输入的信息无异常</span>
+        </p>
+        <div v-show="this.a == 200001" style="text-align:center">
+            <span>系统不存在该用户</span>
+        </div>
+        <div v-show="this.a == 200003" style="text-align:center">
+            <span>该用户退款信息已存在</span>
+        </div>
+        <div v-show="this.a == 0" style="text-align:center">
+            <span>信息无异常</span>
+        </div>
+        <div slot="footer">
+             <Button type="success" @click="confirmAdd" v-show="this.a == 0">确定</Button>
+             <Button type="error" @click="confirmCancel" v-show="this.a != 0">取消</Button>
+        </div>
     </Modal>
 
+       
     <!-- 历史记录，点击历史记录按钮弹出 -->
     <Modal v-model="showModal" @on-ok="saveTable" @on-visible-change="resetData" @on-cancel="cancelTable" width=50%>
         <h3 slot="header" style="color:#2D8CF0">历史记录</h3>
@@ -126,7 +144,7 @@
             <FormItem label="客户名" prop="wangwangnum" v-if="showEditForm.wangwangnum != null">
                 <Input disabled v-model="showEditForm.wangwangnum" style="width:180px" />
             </FormItem>
-            <FormItem label="隐患次数" prop="frequency" v-if="showEditForm.frequency != null">
+            <FormItem label="次数" prop="frequency" v-if="showEditForm.frequency != null">
                 <Input disabled v-model="showEditForm.frequency" style="width:180px" />
             </FormItem>
             <FormItem label="客户类型" v-if="showEditForm.custtype != null">
@@ -148,7 +166,7 @@
                 <Input disabled v-model="showEditForm.refundAmount" style="width:180px" />
             </FormItem>
             <FormItem label="退款渠道" prop="refundChannel" v-if="showEditForm.refundChannel != null">
-                <select v-model="showEditForm.refundChannel" disabled style="width:180px">
+                <select v-model="showEditForm.refundChannel" disabled style="width:180px;height:30px">
                     <option value="1">SEM在线订购</option>
                     <option value="2">支付宝转账</option>
                     <option value="3">网银转账</option>
@@ -176,7 +194,7 @@
 
             <!-- 投诉管理 -->
             <FormItem label="投诉渠道" prop="channel" v-if="showEditForm.channel != null">
-                <select v-model="showEditForm.channel" disabled style="width:180px">
+                <select v-model="showEditForm.channel" disabled style="width:180px;height:30px">
                     <option value="1">招商京东</option>
                     <option value="2">招商淘宝</option>
                     <option value="3">综管部</option>
@@ -194,7 +212,7 @@
                 <Input v-model="showEditForm.number" disabled placeholder="店铺近30天成交笔数" style="width:180px" />
             </FormItem>
             <FormItem label="判责结果" prop="result" v-if="showEditForm.result != null">
-                <select v-model="showEditForm.result" disabled placeholder="选择状态" filterable style="width:180px">
+                <select v-model="showEditForm.result" disabled placeholder="选择状态" filterable style="width:180px;height:30px">
                     <option value="0">微责</option>
                     <option value="1">无责</option>
                     <option value="2">重责</option>
@@ -204,7 +222,7 @@
                 </select>
             </FormItem>
             <FormItem label="店铺行业" prop="industry" v-if="showEditForm.industry != null">
-                <select v-model="showEditForm.industry" disabled placeholder="请选择投诉渠道" clearable filterable style="width:180px">
+                <select v-model="showEditForm.industry" disabled placeholder="请选择投诉渠道" clearable filterable style="width:180px;height:30px">
                     <option value="1">3c数码配件</option>
                     <option value="2">MP3/MP4/ipod/录音笔</option>
                     <option value="3">ZIPPO/瑞士军刀/眼镜</option>
@@ -246,7 +264,7 @@
                 </select>
             </FormItem>
             <FormItem label="跟进人员" prop="followPersonel" v-if="showEditForm.followPersonel != null">
-                <select v-model="showEditForm.followPersonel" disabled placeholder="无责任人" style="width:180px">
+                <select v-model="showEditForm.followPersonel" disabled placeholder="无责任人" style="width:180px;height:30px">
                     <option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
                         {{personnelId.username}}
                     </option>
@@ -273,7 +291,7 @@
                 </Select>
             </FormItem>
             <FormItem label="客诉小类别" prop="complaintName" v-if="showEditForm.level != null">
-                <select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px">
+                <select v-model="showEditForm.sonLevel" disabled placeholder="Select your pkId" style="width:180px;height:30px">
                     <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                         {{complaintNameId.complaintName}}
                     </option>
@@ -330,7 +348,7 @@
                 </FormItem>
 
                 <FormItem label="退款渠道" prop="refundChannel">
-                    <select v-model="showEditForm.refundChannel" style="width: 160px;height:35px">
+                    <select v-model="showEditForm.refundChannel" style="width: 160px;height:30px">
                         <option value="1">SEM在线订购</option>
                         <option value="2">支付宝转账</option>
                         <option value="3">网银转账</option>
@@ -382,7 +400,7 @@
                 </Col>
                 <Col span="12">
                 <FormItem label="客诉小类别" prop="complaintName">
-                    <select v-model="showEditForm.complaintIds" placeholder="Select your pkId" style="width: 180px">
+                    <select v-model="showEditForm.complaintIds" placeholder="Select your pkId" style="width: 180px;height:30px">
                         <option v-for="complaintNameId in levelNames" :label="complaintNameId.complaintName" :value="complaintNameId.complaintIds" :key="complaintNameId.complaintIds">
                             {{complaintNameId.complaintName}}
                         </option>
@@ -438,6 +456,8 @@ export default { //主方法
     name1: "Files",
     data() {
         return {
+            a:0,
+
             params: {
                 wangwangnum: '',
                 shopptype: '',
@@ -445,8 +465,6 @@ export default { //主方法
                 username2: '',
                 TeamName: '',
                 dateTime: '',
-                // startTime: '',
-                // endTime: '',
                 result: -1,
                 TScustomer: '',
                 PersonnelID: -1,
@@ -917,12 +935,8 @@ export default { //主方法
             }) => {
                 if (data && data.code == 0) {
                     this.data1 = data.data.list;
-                    // console.log("第一个data1为:"+this.data1);
                     this.totalCount = data.data.total;
                     this.length = data.data.list.length;
-                    // for(var i = 0;i<this.length;i++){
-                    //     this.pkIds.push(data.data.list[i].pkIds);
-                    // }
                     this.ajaxHistoryDatas = data.data.list;
                     this.totalCount = data.data.total;
                     if(this.ajaxHistoryDatas<this.pageSize){
@@ -936,6 +950,29 @@ export default { //主方法
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             });
+             //大类
+                API.complaintList.selectLevel(this.params).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.levels = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                }); //大类
+                API.complaintList.selectLevel(this.params).then(({
+                    data
+                }) => {
+                    if (data && data.code == 0) {
+                        this.levels = data.data;
+                    } else {
+                        this.$Message.error(data.msg);
+                    }
+                }).catch((data) => {
+                    this.$Message.error('连接失败，请检查网络！');
+                });
             this.loading = false;
         },
         init() {
@@ -986,7 +1023,6 @@ export default { //主方法
             var _end = index*this.pageSize;
             this.historyDatas = this.ajaxHistoryDatas.slice(_start,_end);
         },
-        
         resetData(val) {
             if (!val) {
                 this.showEditForm = {
@@ -1026,7 +1062,6 @@ export default { //主方法
         addModal() {
             this.showAddModal = true;
         },
-
         //批量上传文件
         uploadAdd(params, showFileForm) {
             this.ts = true;
@@ -1085,10 +1120,12 @@ export default { //主方法
                 this.$refs.form1.resetFields();
             }).catch((data) => {
                 this.$Message.error('请完成所有数据添加!');
-            })
+            });
+            this.confirmModal = false;
         },
         //退出确定
         confirmCancel() {
+            this.confirmModal = false;
             this.showAddModal = true;
         },
         //调用查看旺旺名是否存在接口
@@ -1096,8 +1133,11 @@ export default { //主方法
             API.refundList.ByWang(this.showAddForm).then(({
                 data
             }) => {
-                if (data.code == 200003) {} else {
-                    this.$Message.error("请选择正确用户");
+                this.a = data.code;
+                if (data.code == 200001) {
+                    this.$Message.error("系统不存在该用户");
+                } else if(data.code == 200003){
+                    this.$Message.error("退款列表中存在该用户");
                 }
             })
         },
@@ -1143,6 +1183,7 @@ export default { //主方法
 
         //详情
         showEditModalDataAll(params) {
+            if(params.row.level !=null){
             //大类
             API.complaintList.selectLevel(this.params).then(({
                 data
@@ -1170,6 +1211,7 @@ export default { //主方法
             }).catch((data) => {
                 this.$Message.error('当前没有判责');
             });
+            }
             this.showEditModalAll = true;
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
@@ -1227,6 +1269,7 @@ export default { //主方法
         //修改
         showEditModalData(params) {
             this.showEditModal = true;
+            if(params.row.level !=null){
             API.complaintList.selectLevel(this.params).then(({
                 data
             }) => {
@@ -1251,6 +1294,7 @@ export default { //主方法
             }).catch((data) => {
                 this.$Message.error('当前没有判责');
             });
+            }
             if (typeof params.row != 'undefined') {
                 const Refund = params.row;
                 this.showEditForm.pkId = Refund.pkId;
@@ -1279,7 +1323,6 @@ export default { //主方法
                 this.showEditForm.tename = Refund.username1;
                 this.showEditForm.pname = Refund.username2;
                 this.showEditForm.complaintIds = this.showEditForm.sonLevel;
-                console.log("变更后的小类别:"+this.showEditForm.complaintIds);
             }
         },
 
@@ -1434,20 +1477,23 @@ export default { //主方法
         //点击客诉大类别
         selectLevel(params) {
             // this.params1.parentId = this.showEditForm.level;
-            this.showEditForm.parentId = this.params1.parentId;
-            this.showEditForm.sonLevel = this.showEditForm.sonLevel;
+            this.showEditForm.parentId = this.showEditForm.level;
+            console.log(this.showEditForm.level+"id为..........");
+            this.params1.parentId = this.showEditForm.parentId;
             //小类
+            if(this.params1.parentId !=null){
             API.complaintList.getLevelName(this.params1).then(({
                 data
             }) => {
                 if (data && data.code == 0) {
-                    this.levelNames = data.data.list;
+                    this.levelNames = data.data;
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('当前没有判责');
             });
+            }
         },
         //点击详情确定可以修改客诉信息
         saveEdits() {
