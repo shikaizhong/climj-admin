@@ -1,25 +1,31 @@
 <template>
 <div>
-    <Row style="margin-top: 15px" type="flex" justify="space-around" class="code-row-bg">
-        <Col span="4" push=2>
-        <Select @on-change="searchComplaint" v-model="params.TScustomer" placeholder="选择店长" clearable filterable>
+    <Row style="margin-top: 15px" type="flex">
+        <Col span="4" push="2">
+        <Select @on-change="init" v-model="params.TScustomer" style="width: 170px" placeholder="选择店长" clearable filterable>
             <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
                 {{teamNameId.username}}
             </Option>
         </Select>
         </Col>
-        <Col span="4" push=1>
-        <Select @on-change="searchComplaint" v-model="params.PersonnelID" placeholder="选择签约人" number clearable filterable>
+        <Col span="4" push="2">
+        <Select @on-change="init" v-model="params.PersonnelID" style="width: 170px" placeholder="选择签约人" number clearable filterable>
             <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
                 {{teamNameId.username}}
             </Option>
         </Select>
         </Col>
-        <Col span="4" push=1>
-        <Input placeholder="选择店长组别" v-model="params.TeamName" size="large" @on-change="searchComplaint" clearable filterablea />
+        <Col span="4" push="2">
+        <Input placeholder="选择店长组别" v-model="params.TeamName" style="width: 170px" @on-change="init" clearable filterablea />
         </Col>
-        <Col span="4">
-        <Select placeholder="判责结果:" style="width: 300px;height:35px" v-model="params.result" @on-change="searchComplaint" clearable filterablea>
+        <!-- 日期查询 -->
+        <Col span="4" push="2">
+        <Date-picker type="datetimerange" v-model="params.dateTime" format="yyyy-MM-dd HH:mm" @on-change="init" placeholder="选择日期和时间"></Date-picker>
+        </Col>
+    </Row>
+    <Row style="margin-top: 15px" >
+        <Col span="4" push="2">
+        <Select placeholder="判责结果:" style="width: 170px" v-model="params.result" @on-change="init" clearable filterablea>
             <Option value="0">微责</Option>
             <Option value="1">无责</Option>
             <Option value="2">重责</Option>
@@ -29,32 +35,17 @@
             <Option value="-1">全部</Option>
         </Select>
         </Col>
-    </Row>
-    <Row style="margin-top: 15px" type="flex" justify="start" class="code-row-bg">
-        <Col span="2">
-        <Select placeholder="请选择判责类型:" filterable v-model="params.type" @on-change="searchComplaint">
-            <Option value="0">投诉</Option>
-            <Option value="1">隐患</Option>
-            <Option value="2">退款</Option>
-        </Select>
+        <!-- <Col span="4" push=3>
+        <Input placeholder="客诉大类别" v-model="params.parentName" @on-change="init" size="large" clearable />
+        </Col> -->
+        <Col span="4" push="2">
+        <Input placeholder="搜索客诉级别" v-model="params.grade" @on-change="init" style="width: 170px" clearable />
         </Col>
-
-        <!-- 日期查询 -->
-        <Col span="3" push=1>
-        <Date-picker type="datetimerange" v-model="params.dateTime" format="yyyy-MM-dd HH:mm" @on-change="searchComplaint" placeholder="选择日期和时间" style="width: 300px"></Date-picker>
+        <Col span="4" push="2">
+        <Input placeholder="搜索店铺名" v-model="params.keyword" style="width: 170px" clearable />
         </Col>
-
-        <Col span="4" push=3>
-        <Input placeholder="客诉大类别" v-model="params.parentName" @on-change="searchComplaint" size="large" clearable />
-        </Col>
-        <Col span="4" push=4>
-        <Input placeholder="搜索客诉级别" v-model="params.grade" @on-change="searchComplaint" size="large" clearable />
-        </Col>
-        <Col span="4" push=5>
-        <Input placeholder="搜索店铺名" v-model="params.keyword" size="large" style="width: auto" clearable />
-        </Col>
-        <Col span="4" push=4>
-        <span><Button type="primary" @click="searchComplaint" icon="search">搜索</Button></span>
+        <Col span="4" push="2">
+        <span><Button type="primary" @click="init" icon="search">搜索</Button></span>
         </Col>
     </Row>
     <!--table数据-->
@@ -144,7 +135,7 @@
             <Row>
                 <Col span="12">
                 <FormItem label="责任人" prop="responsibilityer">
-                    <Select v-model="showEditForm.responsibilityer" placeholder="无责任人" style="width: 300px">
+                    <Select v-model="showEditForm.responsibilityer" placeholder="无责任人" style="width: 300px" clearable filterable>
                         <Option v-for="personnelId in personnelIds" :label="personnelId.username" :value="personnelId.id" :key="personnelId.id">
                             {{personnelId.username}}
                         </Option>
@@ -510,9 +501,9 @@
             <FormItem label="备注" prop="remark" v-if="showEditForm.remark != null">
                 <Input disabled v-model="showEditForm.remark" type="textarea" style="width:400px" />
             </FormItem>
-            <FormItem label="外因" prop="externalCause" v-if="showEditForm.externalCause != null">
+            <!-- <FormItem label="外因" prop="externalCause" v-if="showEditForm.externalCause != null">
                 <Input v-model="showEditForm.externalCause" type="textarea" style="width:400px" />
-            </FormItem>
+            </FormItem> -->
         </Form>
     </Modal>
     <!--点击查看隐患详情-->
@@ -687,21 +678,6 @@ export default {
                     //     }, text);
                     // },
                     key : 'complaintName',
-                    align: 'center'
-                },
-                {
-                    title: '判责类型',
-                    align: 'center',
-                    render: (h, params) => {
-                        const row = params.row;
-                        const color = row.type == 0 ? 'green' : (row.type == 1 ? 'red' : (row.type == 2 ? 'blue' : 'purple'));
-                        const text = row.type == 0 ? '投诉' : (row.type == 1 ? "隐患" : (row.type == 2 ? '退款' : '其他'));
-                        return h('Tag', {
-                            props: {
-                                color: color
-                            }
-                        }, text);
-                    },
                     align: 'center'
                 },
                 {
@@ -1005,6 +981,7 @@ export default {
             url: null,
             name: null,
             pkIds: 0,
+            nums: 0,
             complaintId: 0,
             totalCount: 0,
             pkId: 0,
@@ -1050,6 +1027,7 @@ export default {
                 name: '',
                 complaintId: '',
                 hDate: '',
+                aspId:'',
             },
             //点击隐患详情
             modifierForm: {
@@ -1069,6 +1047,7 @@ export default {
                 isDelete: '',
                 level: '',
                 hDate: '',
+                aspId:'',
             },
             //点击投诉详情
             refundForm: {
@@ -1092,6 +1071,7 @@ export default {
                 isDelete: '',
                 deadline: '',
                 hDate: '',
+                aspId:'',
             },
             //客诉大类别
             levels: [],
@@ -1126,7 +1106,8 @@ export default {
                 serverdeadline: '',
                 personnelid: '',
                 pname: '',
-                pteamname: ''
+                pteamname: '',
+                aspId:'',
             },
         }
     },
@@ -1152,10 +1133,10 @@ export default {
                     //新增分页
                     this.ajaxHistoryDatas = data.data.list;
                     this.totalCount = data.data.total;
-                    if(this.ajaxHistoryDatas<this.pageSize){
+                    if (this.ajaxHistoryDatas < this.pageSize) {
                         this.historyDatas = this.ajaxHistoryDatas;
-                    }else{
-                        this.historyDatas = this.ajaxHistoryDatas.slice(0,this.pageSize);
+                    } else {
+                        this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
                     }
                 } else {
                     this.$Message.error(data.msg);
@@ -1225,6 +1206,7 @@ export default {
             this.selection = data;
         },
         pageChange(index){
+            this.nums = index
             var _start = (index-1)*this.pageSize;
             var _end = index*this.pageSize;
             this.historyDatas = this.ajaxHistoryDatas.slice(_start,_end);
@@ -1232,10 +1214,7 @@ export default {
         //点击修改
         showEditModalData(params) {
             this.showEditModal = true;
-            this.params.complaintId = params.row.pkId;
             this.showEditForm.type = params.row.type;
-            let complaintId = this.params.complaintId;
-            this.showEditForm.complaintId = complaintId;
             if(params.row.level !=null){
             //大类
             API.complaintList.selectLevel(this.params).then(({
@@ -1266,6 +1245,8 @@ export default {
             if (typeof params.row != 'undefined') {
                 const responsibilityList = params.row;
                 this.showEditForm.pkId = responsibilityList.pkId;
+                this.showEditForm.aspId = responsibilityList.aspId;
+                console.log("主键为:"+this.showEditForm.aspId);
                 this.showEditForm.level = responsibilityList.level;
                 this.showEditForm.sonLevel = responsibilityList.sonLevel;
                 this.showEditForm.result = responsibilityList.result;
@@ -1300,9 +1281,37 @@ export default {
             API.responsibilityList.update(this.showEditForm).then(({
                 data
             }) => {
-                console.log(this.showEditForm.complaintNam + "修改后的时间");
                 if (data && data.code == 0) {
-                    this.init();
+                     API.responsibilityList.lists(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.data1 = data.data.list;
+                    this.totalCount = data.data.total;
+                    this.length = data.data.list.length;
+                    //新增分页
+                    this.ajaxHistoryDatas = data.data.list;
+                    this.totalCount = data.data.total;
+                   if (this.ajaxHistoryDatas.length <= this.pageSize) {
+                                this.historyDatas = this.ajaxHistoryDatas;
+                                 var kaishi = (this.nums-1) * this.pageSize;
+                                 var jieshu = (this.nums) * this.pageSize;
+                    console.log(jieshu)
+                    this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
+                            } else {
+                                 this.historyDatas = this.ajaxHistoryDatas;
+                                 var kaishi = (this.nums-1) * this.pageSize;
+
+                    var jieshu = (this.nums) * this.pageSize;
+                    console.log(jieshu)
+                    this.historyDatas = this.ajaxHistoryDatas.slice(kaishi, jieshu);
+                            }
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -1365,7 +1374,8 @@ export default {
         //点击上传依据
         fileModal(params) {
             this.ts = true;
-            this.params.id = params.row.pkId;
+            this.params.id = params.row.aspId;
+            console.log("文件主键为:"+this.params.id);
             let complaintId = this.params.id;
             this.complaintId = complaintId;
             this.params.pageNumber = 1;
@@ -1425,8 +1435,8 @@ export default {
         //点击查看上传依据
         lookFileModal(params) {
             this.showFileModal = true;
-            this.params.complaintId = params.row.pkId;
-            this.showEditForm.complaintId = params.row.pkId;
+            this.params.complaintId = params.row.aspId;
+            this.showEditForm.complaintId = params.row.aspId;
             this.pageNumber = 1;
             this.loading = true;
             /*data是接口返回的data*/
@@ -1504,12 +1514,10 @@ export default {
         details(params) {
             let paramss = params.row.type;
             this.detailsModal = true;
-            console.log(paramss + "type为");
             //0是投诉
             if (paramss == 0) {
                 this.params.pkId = params.row.pkId;
                 this.params.type = params.row.type;
-                console.log(params.row.pkId + "id为")
                 API.responsibilityList.selectById(this.params).then(({
                     data
                 }) => {
@@ -1677,7 +1685,7 @@ export default {
                 this.showEditForm.refundAmount = Complaint.refundAmount;
                 this.showEditForm.result = Complaint.result;
                 this.showEditForm.isDelete = Complaint.isDelete;
-                this.showEditForm.hDate = Complaint.refundDate;
+                this.showEditForm.hDate = Complaint.reDate;
                 this.showEditForm.createTime = Complaint.createTime;
                 this.showEditForm.refundCause = Complaint.refundCause;
                 this.showEditForm.custtype = Complaint.custtype;
@@ -1699,12 +1707,10 @@ export default {
                 this.showEditForm.username = Complaint.username;
                 this.showEditForm.channel = Complaint.channel;
                 this.showEditForm.tename = Complaint.tename;
-                console.log("店长为:" + Complaint.tename);
                 this.showEditForm.turnover = Complaint.turnover;
                 this.showEditForm.number = Complaint.number;
                 this.showEditForm.industry = Complaint.industry;
                 this.showEditForm.followPersonel = Complaint.followPersonel;
-                console.log(this.showEditForm.followPersonel + "跟进人员为");
                 this.showEditForm.processingScheme = Complaint.processingScheme;
                 this.showEditForm.followProcess = Complaint.followProcess;
                 this.showEditForm.content = Complaint.content;

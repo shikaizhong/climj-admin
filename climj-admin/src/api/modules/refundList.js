@@ -126,3 +126,12 @@ export function updataLevel(params){
     data:requestParam(params,'post',true,'json')
   })
 }
+
+//旺旺名查看是否存在
+export function selectByRefundWangwangnum(params){
+  return request({
+    method:'post',
+    url:requestURL('/sys/refund/selectByRefundWangwangnum'),
+    data:requestParam(params,'post',true,'json')
+  })
+}
