@@ -31,7 +31,12 @@
         <Input v-model="params.wangwangnum" style="width:170px" @on-change="init" placeholder="请输入客户名" clearable />
         </Col>
         <Col span="4">
-        <Input v-model="params.shopptype" style="width:170px" @on-change="init" placeholder="请输入店铺类型" clearable />
+        <!-- <Input v-model="params.shopptype" style="width:170px" @on-change="init" placeholder="请输入店铺类型" clearable /> -->
+         <Select @on-change="init" v-model="params.shopptype" placeholder="选择店铺类别" style="width: 170px" clearable filterable>
+            <Option v-for="shopptype in shopptypes" :label="shopptype.shopptype" :value="shopptype.shopptype" :key="shopptype.shopptype" >
+              {{shopptype.shopptype}}
+            </Option>
+          </Select>
         </Col>
         <!-- 日期查询 -->
         <Col span="4">
@@ -40,13 +45,28 @@
     </Row>
     <Row style="margin-top:5px">
         <Col span="4" push=2>
-        <Input v-model="params.username1" style="width:170px" @on-change="init" placeholder="请输入店长" clearable />
+        <!-- <Input v-model="params.username1" style="width:170px" @on-change="init" placeholder="请输入店长" clearable /> -->
+         <Select @on-change="init" v-model="params.TScustomer" placeholder="选择店长" style="width:170px" clearable filterable>
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+                {{teamNameId.username}}
+            </Option>
+        </Select>
         </Col>
         <Col span="4" push=2>
-        <Input v-model="params.username2" style="width:170px" @on-change="init" placeholder="请输入招商顾问" clearable />
+        <!-- <Input v-model="params.username2" style="width:170px" @on-change="init" placeholder="请输入招商顾问" clearable /> -->
+         <Select @on-change="init" v-model="params.PersonnelID" placeholder="选择招商顾问" style="width: 170px" clearable filterable>
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+                {{teamNameId.username}}
+            </Option>
+        </Select>
         </Col>
         <Col span="4" push=2>
-        <Input v-model="params.TeamName" style="width:170px" @on-change="init" placeholder="请输入团队" clearable />
+        <!-- <Input v-model="params.TeamName" style="width:170px" @on-change="init" placeholder="请输入团队" clearable /> -->
+        <Select @on-change="init" v-model="params.TeamName" placeholder="选择团队" style="width: 170px" clearable filterable>
+            <Option v-for="teamNameId in teamNameIds" :label="teamNameId.teamname" :value="teamNameId.teamname" :key="teamNameId.teamname" >
+              {{teamNameId.teamname}}
+            </Option>
+          </Select>
         </Col>
         <Col span="4" push=2>
         <Input v-model="params.frequency" style="width:170px" @click="init" placeholder="请输入隐患次数" clearable />
@@ -59,14 +79,14 @@
 
     <!-- 主页面的表格 -->
     <Row style="margin-top: 25px">
-        <Table border ref="selection" :columns="columns1" :data="historyDatas" width=100%>
+        <Table border ref="selection" :columns="columns1" :data="historyData" width=100%>
         </Table>
     </Row>
 
     <!-- 分页 -->
     <Row>
         <div style="float:right">
-            <Page :total="totalCount" :page-size="pageSize" loading @on-change="pageChange" />
+            <Page :total="totalCount" :page-size="pageSize" :current="pageCurrent" show-total  @on-change="changepage"></Page>
         </div>
     </Row>
 
@@ -419,14 +439,15 @@ export default {
                 level: 0,
                 parentId: 0,
             },
-            ajaxHistoryDatas: [],
-            historyDatas: [],
             totalCount: 0,
+            pageSize:10,
+            pageNum:1,
+            pageCurrent:1,
+            ajaxHistoryData:[],
+            historyData:[],
+            shopptypes:[],
             //状态码
             a: 0,
-            index: 1,
-            nums: 0,
-            pageSize: 10,
             showAddModal: false, //不显示
             loading: false,
             //添加按钮刚开始不显示
@@ -806,6 +827,8 @@ export default {
                 }
             ],
             personnelIds: [],
+            //团队名
+            teamNameIds:[],
             complaintIds: {
                 pkId: '',
                 parentId: '',
@@ -858,25 +881,36 @@ export default {
                     this.totalCount = data.data.total;
                     this.length = data.data.list.length;
                     //新增分页
-                    this.ajaxHistoryDatas = data.data.list;
-                    this.totalCount = data.data.total;
-                    if (this.ajaxHistoryDatas < this.pageSize) {
-                        this.historyDatas = this.ajaxHistoryDatas;
-                    } else {
-                        console.log("进来了吗" + this.index);
-                        this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
-                    }
+                     //新增分页
+                    this.ajaxHistoryData= this.data1;
+                    console.log("数据为："+this.ajaxHistoryData);
+                    var _start = ( this.pageCurrent - 1 ) * this.pageSize;
+                    var _end = this.pageCurrent * this.pageSize;
+                    this.historyData = this.ajaxHistoryData.slice(_start,_end);
                 } else {
                     this.$Message.error(data.msg);
                 }
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             });
+            //遍历用户名
             API.complaintList.complaintNames(this.params).then(({
                 data
             }) => {
                 if (data && data.code == 0) {
                     this.personnelIds = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
+            //仅仅遍历团队名
+            API.hiddenTroubleList.selectOnleTeam(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.teamNameIds = data.data;
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -895,15 +929,37 @@ export default {
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             });
+             //店铺类型
+            API.hiddenTroubleList.selectShopType(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.shopptypes = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
             this.loading = false;
         },
 
-        pageChange(index) {
-            this.nums = index
-            var _start = (index - 1) * this.pageSize;
-            var _end = index * this.pageSize;
-            this.historyDatas = this.ajaxHistoryDatas.slice(_start, _end);
+        pageShow(){
+            // 保存取到的所有数据
+            this.ajaxHistoryData= this.data1;
+            console.log("数据为："+this.ajaxHistoryData);
+            var _start = ( this.pageCurrent - 1 ) * this.pageSize;
+            var _end = this.pageCurrent * this.pageSize;
+            this.historyData = this.ajaxHistoryData.slice(_start,_end);
         },
+
+        changepage(index){
+            var _start = ( index - 1 ) * this.pageSize;
+            var _end = index * this.pageSize;
+            this.historyData = this.ajaxHistoryData.slice(_start,_end);
+            this.pageCurrent=index;
+        },
+
 
         /* 删除模块，弹出弹框*/
         delete(params) {
@@ -1022,39 +1078,39 @@ export default {
             }) => {
 
                 if (data && data.code == 0) {
-                    API.hiddenTroubleList.lists(this.params).then(({
-                        data
-                    }) => {
-                        if (data && data.code == 0) {
-                            this.data1 = data.data.list;
-                            this.totalCount = data.data.total;
-                            this.length = data.data.list.length;
-                            //新增分页
-                            this.ajaxHistoryDatas = data.data.list;
-                            this.totalCount = data.data.total;
-                            if (this.ajaxHistoryDatas.length <= this.pageSize) {
-                                // this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
-                                this.historyDatas = this.ajaxHistoryDatas;
-                                var kaishi = (this.nums - 1) * this.pageSize;
-                                var jieshu = (this.nums) * this.pageSize;
-                                console.log(jieshu)
-                                this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
+                //     API.hiddenTroubleList.lists(this.params).then(({
+                //         data
+                //     }) => {
+                //         if (data && data.code == 0) {
+                //             this.data1 = data.data.list;
+                //             this.totalCount = data.data.total;
+                //             this.length = data.data.list.length;
+                //             //新增分页
+                //             this.ajaxHistoryDatas = data.data.list;
+                //             this.totalCount = data.data.total;
+                            // if (this.ajaxHistoryDatas.length <= this.pageSize) {
+                            //     // this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
+                            //     this.historyDatas = this.ajaxHistoryDatas;
+                            //     var kaishi = (this.nums - 1) * this.pageSize;
+                            //     var jieshu = (this.nums) * this.pageSize;
+                            //     console.log(jieshu)
+                            //     this.historyDatas = this.ajaxHistoryDatas.slice(0, this.pageSize);
 
-                            } else {
-                                this.historyDatas = this.ajaxHistoryDatas;
-                                var kaishi = (this.nums - 1) * this.pageSize;
+                            // } else {
+                            //     this.historyDatas = this.ajaxHistoryDatas;
+                            //     var kaishi = (this.nums - 1) * this.pageSize;
 
-                                var jieshu = (this.nums) * this.pageSize;
-                                console.log(jieshu)
-                                this.historyDatas = this.ajaxHistoryDatas.slice(kaishi, jieshu);
-                            }
-                        } else {
-                            this.$Message.error(data.msg);
-                        }
-                    }).catch((data) => {
-                        this.$Message.error('连接失败，请检查网络！');
-                    });
-
+                            //     var jieshu = (this.nums) * this.pageSize;
+                            //     console.log(jieshu)
+                            //     this.historyDatas = this.ajaxHistoryDatas.slice(kaishi, jieshu);
+                            // }
+                        // } else {
+                        //     this.$Message.error(data.msg);
+                        // }
+                    // }).catch((data) => {
+                    //     this.$Message.error('连接失败，请检查网络！');
+                    // });
+                    this.init();
                 } else {
                     this.$Message.error(data.msg);
                 }

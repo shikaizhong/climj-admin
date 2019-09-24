@@ -22,7 +22,12 @@
         <Input v-model="params.wangwangnum" @on-change="inits" placeholder="请输入客户名" style="width: 170px" clearable filterable />
         </Col>
         <Col span="4">
-        <Input v-model="params.shopptype" @on-change="inits" placeholder="请输入店铺类型" style="width: 170px" :clearable="isClearAble" />
+        <!-- <Input v-model="params.shopptype" @on-change="inits" placeholder="请输入店铺类型" style="width: 170px" :clearable="isClearAble" /> -->
+         <Select @on-change="inits" v-model="params.shopptype" placeholder="选择店铺类别" style="width: 170px" clearable filterable>
+            <Option v-for="shopptype in shopptypes" :label="shopptype.shopptype" :value="shopptype.shopptype" :key="shopptype.shopptype" >
+              {{shopptype.shopptype}}
+            </Option>
+          </Select>
         </Col>
         <!-- 日期查询 -->
         <Col span="4">
@@ -32,10 +37,20 @@
     <Row style="margin-top:5px">
         <!-- 查询 -->
         <Col span="4" push="2">
-        <Input v-model="params.username1" @on-change="inits" style="width: 170px" placeholder="请输入店长" clearable filterable />
+        <!-- <Input v-model="params.username1" @on-change="inits" style="width: 170px" placeholder="请输入店长" clearable filterable /> -->
+        <Select @on-change="inits" v-model="params.TScustomer" placeholder="选择店长" style="width:170px" clearable filterable>
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+                {{teamNameId.username}}
+            </Option>
+        </Select>
         </Col>
         <Col span="4" push="2">
-        <Input v-model="params.username2" @on-change="inits" style="width: 170px" placeholder="请输入招商顾问" clearable filterable />
+        <!-- <Input v-model="params.username2" @on-change="inits" style="width: 170px" placeholder="请输入招商顾问" clearable filterable /> -->
+        <Select @on-change="inits" v-model="params.PersonnelID" placeholder="选择招商顾问" style="width: 170px" clearable filterable>
+            <Option v-for="teamNameId in personnelIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id">
+                {{teamNameId.username}}
+            </Option>
+        </Select>
         </Col>
         <Col span="4" push="2">
         <Input v-model="params.TeamName" @on-change="inits" style="width: 170px" placeholder="请输入团队" clearable filterable />
@@ -495,6 +510,8 @@ export default { //主方法
             showAddModal: false, //不显示
             ajaxHistoryDatas: [],
             historyDatas: [],
+            //店铺类型数组
+            shopptypes:[],
             totalCount: 0,
             pageSize: 10,
             nums: 0,
@@ -969,6 +986,18 @@ export default { //主方法
             }).catch((data) => {
                 this.$Message.error('连接失败，请检查网络！');
             });
+             /*遍历用户名*/
+            API.complaintList.complaintNames(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.personnelIds = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
             //大类
             API.complaintList.selectLevel(this.params).then(({
                 data
@@ -986,6 +1015,18 @@ export default { //主方法
             }) => {
                 if (data && data.code == 0) {
                     this.levels = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
+               //店铺类型
+            API.hiddenTroubleList.selectShopType(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.shopptypes = data.data;
                 } else {
                     this.$Message.error(data.msg);
                 }
@@ -1024,9 +1065,19 @@ export default { //主方法
                 data
             }) => {
                 if (data && data.code == 0) {
-                    // this.technologyRecruitmentIds = data.data;
-                    // this.tscustomerIds =data.data;
                     this.personnelIds = data.data;
+                } else {
+                    this.$Message.error(data.msg);
+                }
+            }).catch((data) => {
+                this.$Message.error('连接失败，请检查网络！');
+            });
+               //店铺类型
+            API.hiddenTroubleList.selectShopType(this.params).then(({
+                data
+            }) => {
+                if (data && data.code == 0) {
+                    this.shopptypes = data.data;
                 } else {
                     this.$Message.error(data.msg);
                 }

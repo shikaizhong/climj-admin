@@ -100,3 +100,19 @@ export function selectFile(params){
         data: requestParam(params, 'post', true, 'json')
     })
 }
+//查询店铺类型
+export function selectShopType(params){
+    return request({
+        method: 'post',
+        url: requestURL('/sys/personnel/selectShopType'),
+        data: requestParam(params, 'post', true, 'json')
+    })
+}
+//仅显示团队名
+export function selectOnleTeam(params){
+    return request({
+        method: 'post',
+        url: requestURL('/sys/personnel/selectOnleTeam'),
+        data: requestParam(params, 'post', true, 'json')
+    })
+}

@@ -61,7 +61,12 @@
         <Input v-model="params.frequency" placeholder="搜索投诉次数" :clearable="isClearAble" style="width:170px" @on-change="init" />
         </Col>
         <Col span="4" push=2>
-        <Input v-model="params.TeamName" placeholder="搜索团队名" :clearable="isClearAble" style="width:170px" @on-change="init" />
+         <Select @on-change="init" v-model="params.TeamID" placeholder="选择团队" style="width: 170px" clearable filterable>
+            <Option v-for="teamNameId in teamNameIds" :label="teamNameId.teamname" :value="teamNameId.id" :key="teamNameId.id" >
+              {{teamNameId.teamname}}
+            </Option>
+          </Select>
+        <!-- <Input v-model="params.TeamName" placeholder="搜索团队名" :clearable="isClearAble" style="width:170px" @on-change="init" /> -->
         </Col>
         <Col span="4" push=2>
         <i-select v-model="params.channel" style="width: 170px" placeholder="请选择投诉渠道" @on-change="init" clearable filterable>
@@ -83,7 +88,7 @@
         </Col>
     </Row>
     <Row style="margin-top: 25px">
-        <Table border ref="selection" :columns="columns1" :current="params.pageNum" @on-selection-change="selectionChange" :data="historyDatas" width=100%>
+        <Table border ref="selection" :columns="columns1" :current="params.pageNum" @on-selection-change="selectionChange" @current="nums" :data="historyDatas" width=100%>
         </Table>
     </Row>
     <Row>
@@ -1420,8 +1425,6 @@ export default {
                 data
             }) => {
                 if (data && data.code == 0) {
-                    // this.technologyRecruitmentIds = data.data;
-                    // this.tscustomerIds =data.data;
                     this.personnelIds = data.data;
                 } else {
                     this.$Message.error(data.msg);
